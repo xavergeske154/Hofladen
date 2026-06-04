@@ -296,6 +296,11 @@ export default function HofladenWebAppStartseite() {
   const [filterOpenNow, setFilterOpenNow] = useState(false);
   const [filterVending247, setFilterVending247] = useState(false);
   const [filterFavorites, setFilterFavorites] = useState(false);
+  const [farmPage, setFarmPage] = useState(1);
+
+  useEffect(() => {
+    setFarmPage(1);
+  }, [searchQuery, selectedCategory, searchPlz, filterOpenNow, filterVending247, filterFavorites]);
 
   const displayedPlaces = useMemo(() => {
     let result = [];
@@ -1201,6 +1206,81 @@ export default function HofladenWebAppStartseite() {
     );
   };
 
+  const renderPlaceGridCard = (place) => {
+    const isFav = favorites.some(f => f.id === place.id);
+    return (
+      <Card key={place.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col justify-between hover:shadow-md transition relative">
+        <div>
+          <div className="h-56 overflow-hidden relative cursor-pointer" onClick={() => navigateTo("farm-detail", { id: place.id })}>
+            <img src={place.image} alt={place.name} className="h-full w-full object-cover" />
+            <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-green-800 shadow-sm">
+              {place.status || 'Aktiv'}
+            </div>
+            {(!user || user.role === 'customer') && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleToggleFavorite(place.id); }} 
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm hover:scale-105 active:scale-95 transition cursor-pointer"
+              >
+                <Heart className={`h-5 w-5 ${isFav ? 'fill-red-500 text-red-500' : 'text-neutral-800'}`} />
+              </button>
+            )}
+          </div>
+          
+          <div className="p-6 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-green-800 bg-green-50 px-3 py-1 rounded-full border border-green-700/10">
+              {place.type}
+            </span>
+            <h2 
+              className="text-2xl font-bold text-neutral-950 leading-tight pt-1 cursor-pointer hover:text-green-800 line-clamp-1" 
+              onClick={() => navigateTo("farm-detail", { id: place.id })}
+            >
+              {place.name}
+            </h2>
+            <div className="space-y-2 text-sm text-neutral-700 pt-1">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-green-800 shrink-0" /> 
+                <span className="truncate">{place.address || 'Keine Adresse hinterlegt'}</span>
+              </div>
+              {place.distance && (
+                <div className="text-xs font-semibold text-green-800 pl-6">
+                  Entfernung: {place.distance}
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-green-800 shrink-0" /> 
+                <span className="truncate">{place.hours}</span>
+              </div>
+            </div>
+            <p className="text-neutral-700 text-sm leading-relaxed line-clamp-2 pt-1">{place.description}</p>
+          </div>
+        </div>
+
+        <div className="p-6 pt-0 flex items-center justify-between border-t border-neutral-50 mt-4">
+          <div className="flex items-center gap-1 font-semibold text-sm">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> {place.rating || '5.0'} 
+            <span className="text-neutral-500 text-xs">({place.reviews || '0'})</span>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              className="h-10 rounded-full px-4 border-neutral-300 text-xs font-bold cursor-pointer"
+              onClick={() => navigateTo("farm-detail", { id: place.id })}
+            >
+              Details
+            </Button>
+            <Button 
+              className="h-10 w-10 rounded-full bg-green-800 p-0 hover:bg-green-900 cursor-pointer"
+              onClick={() => navigateToMap(place.address)}
+            >
+              <Navigation className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
+
   /* ==========================================================================
      PAGES RENDERING
      ========================================================================== */
@@ -1496,153 +1576,160 @@ export default function HofladenWebAppStartseite() {
   );
 
   // 1b. DEDICATED SEARCH PAGE FOR FARMS
-  const renderHoflaeden = () => (
-    <div className="space-y-8">
-      {/* Title section */}
-      <div>
-        <h1 className="text-4xl font-extrabold text-green-950 flex items-center gap-2">
-          <Store className="h-9 w-9 text-green-800" /> Hofläden & Direktvermarkter
-        </h1>
-        <p className="text-neutral-600 mt-2">Durchsuche alle registrierten Hofläden, Verkaufsstände, Milchstationen und Automaten.</p>
-      </div>
+  const renderHoflaeden = () => {
+    const itemsPerPage = 10;
+    const totalPages = Math.max(1, Math.ceil(displayedPlaces.length / itemsPerPage));
+    const paginatedPlaces = displayedPlaces.slice((farmPage - 1) * itemsPerPage, farmPage * itemsPerPage);
 
-      <section className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
-          {/* Search inputs */}
-          <div className="flex flex-col md:flex-row gap-3 max-w-2xl rounded-[1.75rem] bg-white p-2.5 shadow-sm ring-1 ring-neutral-200">
-            <div className="flex flex-1 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
-              <Search className="h-5 w-5 text-neutral-400 shrink-0" />
-              <input 
-                className="min-w-0 flex-1 bg-transparent py-2 outline-none text-sm text-neutral-800" 
-                placeholder="Suchbegriff (z.B. Maier, Milch)..." 
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
-              />
+    return (
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Title section */}
+        <div>
+          <h1 className="text-4xl font-extrabold text-green-950 flex items-center gap-2">
+            <Store className="h-9 w-9 text-green-800" /> Hofläden & Direktvermarkter
+          </h1>
+          <p className="text-neutral-600 mt-2">Durchsuche alle registrierten Hofläden, Verkaufsstände, Milchstationen und Automaten.</p>
+        </div>
+
+        <section className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            {/* Search inputs */}
+            <div className="flex flex-col md:flex-row gap-3 max-w-2xl rounded-[1.75rem] bg-white p-2.5 shadow-sm ring-1 ring-neutral-200">
+              <div className="flex flex-1 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
+                <Search className="h-5 w-5 text-neutral-400 shrink-0" />
+                <input 
+                  className="min-w-0 flex-1 bg-transparent py-2 outline-none text-sm text-neutral-800" 
+                  placeholder="Suchbegriff (z.B. Maier, Milch)..." 
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
+                />
+              </div>
+              
+              <div className="flex w-full md:w-44 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
+                <MapPin className="h-5 w-5 text-neutral-400 shrink-0" />
+                <input 
+                  className="w-full bg-transparent py-2 outline-none text-sm text-neutral-800" 
+                  placeholder="PLZ oder Ort..." 
+                  value={plzInput}
+                  onChange={(e) => setPlzInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
+                />
+              </div>
+              <div className="relative flex w-full md:w-44 items-center gap-1.5 px-2 min-h-[40px]">
+                <span className="text-xs text-neutral-400 uppercase font-bold shrink-0">Radius:</span>
+                <div className="flex items-center gap-1 text-sm font-semibold text-neutral-700 pointer-events-none select-none">
+                  <span>{searchRadius === "DE" ? "DE" : `${searchRadius} km`}</span>
+                  <ChevronDown className="h-4 w-4 text-neutral-500 shrink-0" />
+                </div>
+                <select 
+                  value={searchRadius}
+                  onChange={(e) => setSearchRadius(e.target.value)}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                >
+                  <option value="2">2 km</option>
+                  <option value="5">5 km</option>
+                  <option value="10">10 km</option>
+                  <option value="25">25 km</option>
+                  <option value="50">50 km</option>
+                  <option value="DE">Deutschland</option>
+                </select>
+              </div>
+
+              <Button 
+                className="rounded-full bg-green-800 px-6 py-5 text-sm font-bold hover:bg-green-900 shrink-0"
+                onClick={() => { setSearchQuery(searchInput); setSearchPlz(plzInput); }}
+              >
+                Suchen
+              </Button>
             </div>
             
-            <div className="flex w-full md:w-44 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
-              <MapPin className="h-5 w-5 text-neutral-400 shrink-0" />
-              <input 
-                className="w-full bg-transparent py-2 outline-none text-sm text-neutral-800" 
-                placeholder="PLZ oder Ort..." 
-                value={plzInput}
-                onChange={(e) => setPlzInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
-              />
-            </div>
-            <div className="relative flex w-full md:w-44 items-center gap-1.5 px-2 min-h-[40px]">
-              <span className="text-xs text-neutral-400 uppercase font-bold shrink-0">Radius:</span>
-              <div className="flex items-center gap-1 text-sm font-semibold text-neutral-700 pointer-events-none select-none">
-                <span>{searchRadius === "DE" ? "DE" : `${searchRadius} km`}</span>
-                <ChevronDown className="h-4 w-4 text-neutral-500 shrink-0" />
-              </div>
-              <select 
-                value={searchRadius}
-                onChange={(e) => setSearchRadius(e.target.value)}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-              >
-                <option value="2">2 km</option>
-                <option value="5">5 km</option>
-                <option value="10">10 km</option>
-                <option value="25">25 km</option>
-                <option value="50">50 km</option>
-                <option value="DE">Deutschland</option>
-              </select>
-            </div>
-
-            <Button 
-              className="rounded-full bg-green-800 px-6 py-5 text-sm font-bold hover:bg-green-900 shrink-0"
-              onClick={() => { setSearchQuery(searchInput); setSearchPlz(plzInput); }}
-            >
-              Suchen
-            </Button>
-          </div>
-          
-          <div className="mt-5 flex flex-wrap gap-3 text-sm">
-            <button 
-              onClick={() => setFilterOpenNow(!filterOpenNow)}
-              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
-                filterOpenNow 
-                  ? "bg-green-800 text-white border-green-800 font-semibold" 
-                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
-              }`}
-            >
-              Jetzt geöffnet
-            </button>
-            <button 
-              onClick={() => setFilterVending247(!filterVending247)}
-              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
-                filterVending247 
-                  ? "bg-green-800 text-white border-green-800 font-semibold" 
-                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
-              }`}
-            >
-              24/7 Automaten
-            </button>
-            <button 
-              onClick={() => setFilterFavorites(!filterFavorites)}
-              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
-                filterFavorites 
-                  ? "bg-green-800 text-white border-green-800 font-semibold" 
-                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
-              }`}
-            >
-              Favoriten
-            </button>
-          </div>
-        </motion.div>
-        {renderMapPreview()}
-      </section>
-
-      {/* Categories Bar */}
-      <section className="mt-6">
-        <div className="flex gap-4 overflow-x-auto pb-3">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            const isActive = selectedCategory === category.id;
-            return (
+            <div className="mt-5 flex flex-wrap gap-3 text-sm">
               <button 
-                key={category.id} 
-                onClick={() => setSelectedCategory(category.id)} 
-                className={`min-w-[118px] rounded-[1.5rem] p-4 text-center shadow-sm transition cursor-pointer ${isActive ? "bg-green-100 text-green-900 border-2 border-green-800/20" : "bg-white text-neutral-700 hover:bg-neutral-50"}`}
+                onClick={() => setFilterOpenNow(!filterOpenNow)}
+                className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                  filterOpenNow 
+                    ? "bg-green-800 text-white border-green-800 font-semibold" 
+                    : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+                }`}
               >
-                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70"><Icon className="h-7 w-7 text-green-800" /></div>
-                <div className="font-semibold">{category.label}</div>
+                Jetzt geöffnet
               </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Main Grid: Listings + Side Banner */}
-      <section className="mt-4 grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div>
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-green-950">Ergebnisse ({displayedPlaces.length})</h2>
-            {searchQuery || selectedCategory !== 'all' || searchPlz || filterOpenNow || filterVending247 || filterFavorites ? (
-              <Button 
-                variant="ghost" 
-                className="rounded-full text-neutral-500" 
-                onClick={() => { 
-                  setSearchInput(""); 
-                  setSearchQuery(""); 
-                  setSelectedCategory("all"); 
-                  setPlzInput(""); 
-                  setSearchPlz(""); 
-                  setSearchRadius("10"); 
-                  setFilterOpenNow(false); 
-                  setFilterVending247(false); 
-                  setFilterFavorites(false); 
-                }}
+              <button 
+                onClick={() => setFilterVending247(!filterVending247)}
+                className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                  filterVending247 
+                    ? "bg-green-800 text-white border-green-800 font-semibold" 
+                    : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+                }`}
               >
-                Filter zurücksetzen
-              </Button>
-            ) : null}
+                24/7 Automaten
+              </button>
+              <button 
+                onClick={() => setFilterFavorites(!filterFavorites)}
+                className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                  filterFavorites 
+                    ? "bg-green-800 text-white border-green-800 font-semibold" 
+                    : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+                }`}
+              >
+                Favoriten
+              </button>
+            </div>
+          </motion.div>
+          {renderMapPreview()}
+        </section>
+
+        {/* Categories Bar */}
+        <section className="mt-6">
+          <div className="flex gap-4 overflow-x-auto pb-3">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              const isActive = selectedCategory === category.id;
+              return (
+                <button 
+                  key={category.id} 
+                  onClick={() => setSelectedCategory(category.id)} 
+                  className={`min-w-[118px] rounded-[1.5rem] p-4 text-center shadow-sm transition cursor-pointer ${isActive ? "bg-green-100 text-green-900 border-2 border-green-800/20" : "bg-white text-neutral-700 hover:bg-neutral-50"}`}
+                >
+                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70"><Icon className="h-7 w-7 text-green-800" /></div>
+                  <div className="font-semibold">{category.label}</div>
+                </button>
+              );
+            })}
           </div>
-          <div className="space-y-6">
-            {displayedPlaces.length > 0 ? (
-              displayedPlaces.map((place) => renderPlaceCard(place))
+        </section>
+
+        {/* Main Grid: Listings */}
+        <section className="mt-4 space-y-8">
+          <div>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-3xl font-bold text-green-950">Ergebnisse ({displayedPlaces.length})</h2>
+              {searchQuery || selectedCategory !== 'all' || searchPlz || filterOpenNow || filterVending247 || filterFavorites ? (
+                <Button 
+                  variant="ghost" 
+                  className="rounded-full text-neutral-500 cursor-pointer" 
+                  onClick={() => { 
+                    setSearchInput(""); 
+                    setSearchQuery(""); 
+                    setSelectedCategory("all"); 
+                    setPlzInput(""); 
+                    setSearchPlz(""); 
+                    setSearchRadius("10"); 
+                    setFilterOpenNow(false); 
+                    setFilterVending247(false); 
+                    setFilterFavorites(false); 
+                  }}
+                >
+                  Filter zurücksetzen
+                </Button>
+              ) : null}
+            </div>
+
+            {paginatedPlaces.length > 0 ? (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {paginatedPlaces.map((place) => renderPlaceGridCard(place))}
+              </div>
             ) : (
               <Card className="p-8 text-center bg-white rounded-2xl border-neutral-200">
                 <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-3" />
@@ -1651,106 +1738,58 @@ export default function HofladenWebAppStartseite() {
               </Card>
             )}
           </div>
-        </div>
 
-        {/* Sidebar */}
-        <aside className="space-y-4">
-          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-850">Deine Merkliste</div>
-              <h3 className="text-2xl font-bold text-green-950">Favoriten & Leseliste</h3>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
-                Markiere Hofläden mit dem Herz-Symbol und speichere nützliche Blogartikel mit dem Lesezeichen ab. Sie werden automatisch in deinem Browser gesichert, damit du sie jederzeit wiederfindest.
-              </p>
-              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("dashboard")}>
-                Meine Merkliste öffnen
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-6">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={farmPage === 1}
+                onClick={() => {
+                  setFarmPage(prev => Math.max(1, prev - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="rounded-full px-4 border-neutral-300 font-bold cursor-pointer"
+              >
+                &larr; Zurück
               </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
-              <h3 className="text-2xl font-bold text-green-950">Hofladen hinzufügen</h3>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
-                Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
-              </p>
-              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
-                Jetzt Hofladen hinzufügen
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Community Zahlen Card */}
-          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-850">Community</div>
-              <h3 className="text-2xl font-bold text-green-950">Statistik</h3>
-              <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
-                <div className="text-left">
-                  <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
-                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Hofläden</div>
-                </div>
-                <div className="text-left border-l border-neutral-100 pl-4">
-                  <div className="text-3xl font-extrabold text-green-900">1.284</div>
-                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Member</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden text-left">
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Spenden & Erhalt</div>
-                <h3 className="text-xl font-bold text-green-950 mt-1">Unterstütze uns</h3>
-                <p className="mt-2 text-xs leading-relaxed text-neutral-600">
-                  Hofladen-Finder ist kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
-                </p>
-              </div>
-
-              {/* Four custom tiers in small list layout */}
-              <div className="space-y-2 pt-2">
-                {[
-                  { icon: "☕", title: "Kaffee ausgeben", price: "3 €" },
-                  { icon: "🥚", title: "Frühstück unterstützen", price: "5 €" },
-                  { icon: "🥔", title: "Regionalförderer", price: "10 €" },
-                  { icon: "🌻", title: "Projektförderer", price: "25 €" }
-                ].map(opt => (
-                  <button 
-                    key={opt.title}
+              <div className="flex items-center gap-1.5 mx-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
                     onClick={() => {
-                      alert(`Vielen Dank für deine Unterstützung über ${opt.price}! Weiterleitung zu PayPal...`);
+                      setFarmPage(p);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-neutral-100 hover:border-green-800/20 hover:bg-green-50/20 active:scale-[0.98] transition text-left cursor-pointer"
+                    className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
+                      farmPage === p
+                        ? "bg-green-800 text-white font-bold"
+                        : "text-neutral-600 hover:bg-neutral-100"
+                    }`}
                   >
-                    <span className="flex items-center gap-2 text-xs font-semibold text-neutral-800">
-                      <span className="text-sm">{opt.icon}</span>
-                      {opt.title}
-                    </span>
-                    <span className="text-xs font-black text-green-900 bg-green-50 px-2 py-0.5 rounded-md border border-green-700/10">{opt.price}</span>
+                    {p}
                   </button>
                 ))}
               </div>
-
-              {/* Progress info */}
-              <div className="text-[10px] text-neutral-500 font-bold text-center border-t border-neutral-100 pt-3">
-                Bereits unterstützt von 127 Hofladen-Freunden (25.4% des Ziels)
-              </div>
-
-              <Button 
+              <Button
                 variant="outline"
-                className="w-full rounded-full text-xs font-bold py-5 mt-2 cursor-pointer" 
-                onClick={() => navigateTo("support")}
+                size="sm"
+                disabled={farmPage === totalPages}
+                onClick={() => {
+                  setFarmPage(prev => Math.min(totalPages, prev + 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="rounded-full px-4 border-neutral-300 font-bold cursor-pointer"
               >
-                Mehr erfahren
+                Weiter &rarr;
               </Button>
-            </CardContent>
-          </Card>
-        </aside>
-      </section>
-    </div>
-  );
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  };
 
   // 2. DETAILED FARM SHOP PAGE
   const renderFarmDetail = () => {
