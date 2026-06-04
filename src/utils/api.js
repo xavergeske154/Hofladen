@@ -66,6 +66,8 @@ export const api = {
     const params = new URLSearchParams();
     if (filters.q) params.append('q', filters.q);
     if (filters.category) params.append('category', filters.category);
+    if (filters.plz) params.append('plz', filters.plz);
+    if (filters.radius) params.append('radius', filters.radius);
     
     const res = await fetch(`/api/farm-shops?${params.toString()}`, {
       headers: getHeaders(),

@@ -92,8 +92,37 @@ export default function HofladenWebAppStartseite() {
   const [favorites, setFavorites] = useState([]);
   const [readingList, setReadingList] = useState([]);
 
-  // Auto-center map based on places search results coordinates
+  // Postcode Coordinates State to allow centering on searched PLZ even if empty
+  const [plzCoordinates, setPlzCoordinates] = useState(null);
+
+  useEffect(() => {
+    if (searchPlz) {
+      const cleanPlz = searchPlz.trim();
+      const lookup = {
+        '85560': [48.0779, 11.9715],
+        '85604': [48.0827, 11.8267],
+        '85567': [48.0478, 11.9664],
+        '53909': [50.6904, 6.6508],
+      };
+      if (lookup[cleanPlz]) {
+        setPlzCoordinates(lookup[cleanPlz]);
+      } else {
+        // Fallback: deterministic offset in Bavaria if it is some other PLZ
+        let sum = 0;
+        for (let i = 0; i < cleanPlz.length; i++) sum += cleanPlz.charCodeAt(i);
+        const latOffset = ((sum % 100) / 1000) - 0.05;
+        const lngOffset = (((sum >> 8) % 100) / 1000) - 0.05;
+        setPlzCoordinates([48.1371 + latOffset, 11.5754 + lngOffset]);
+      }
+    } else {
+      setPlzCoordinates(null);
+    }
+  }, [searchPlz]);
+
+  // Auto-center map based on places search results coordinates or searchPlz coordinates
   const mapCenter = useMemo(() => {
+    if (plzCoordinates) return plzCoordinates;
+
     const validPlaces = places.filter(p => p.lat && p.lng);
     if (validPlaces.length > 0) {
       const sumLat = validPlaces.reduce((sum, p) => sum + p.lat, 0);
@@ -101,7 +130,7 @@ export default function HofladenWebAppStartseite() {
       return [sumLat / validPlaces.length, sumLng / validPlaces.length];
     }
     return [48.0779, 11.9715]; // Default: Ebersberg
-  }, [places]);
+  }, [places, plzCoordinates]);
 
   const handleOpenMapRoute = (address) => {
     const encodedAddress = encodeURIComponent(address);
