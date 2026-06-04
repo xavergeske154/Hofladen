@@ -423,7 +423,7 @@ export default function HofladenWebAppStartseite() {
     setAdminSuccess("");
     try {
       await api.adminCreateBlog(newBlogForm);
-      setAdminSuccess("Blogbeitrag erfolgreich veröffentlicht!");
+      setAdminSuccess("Blockbeitrag erfolgreich veröffentlicht!");
       setNewBlogForm({ title: "", teaser: "", category: "Allgemein", content: "", image: "" });
       const loadBlogs = await api.getBlogs();
       setBlogs(loadBlogs);
@@ -435,7 +435,7 @@ export default function HofladenWebAppStartseite() {
   const handleDeleteBlog = async (blogId) => {
     try {
       await api.adminDeleteBlog(blogId);
-      setAdminSuccess("Blogbeitrag gelöscht!");
+      setAdminSuccess("Blockbeitrag gelöscht!");
       const loadBlogs = await api.getBlogs();
       setBlogs(loadBlogs);
     } catch (err) {
@@ -459,7 +459,7 @@ export default function HofladenWebAppStartseite() {
         <nav className="hidden items-center gap-6 font-semibold text-neutral-700 md:flex">
           <button onClick={() => navigateTo("home")} className={`hover:text-green-800 transition py-1 ${view === 'home' || view === 'farm-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Entdecken</button>
           <button onClick={() => navigateTo("events")} className={`hover:text-green-800 transition py-1 ${view === 'events' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Events & Kalender</button>
-          <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>DIY & Ratgeber</button>
+          <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Block</button>
           <button onClick={() => navigateTo("cookbook")} className={`hover:text-green-800 transition py-1 ${view === 'cookbook' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Kochbuch</button>
           <button onClick={() => navigateTo("affiliates")} className={`hover:text-green-800 transition py-1 ${view === 'affiliates' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Garten-Shop</button>
         </nav>
@@ -545,7 +545,7 @@ export default function HofladenWebAppStartseite() {
           >
             <button onClick={() => navigateTo("home")} className="text-left py-2 border-b border-neutral-100">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="text-left py-2 border-b border-neutral-100">Events & Kalender</button>
-            <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">DIY & Ratgeber</button>
+            <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Block</button>
             <button onClick={() => navigateTo("cookbook")} className="text-left py-2 border-b border-neutral-100">Kochbuch</button>
             <button onClick={() => navigateTo("affiliates")} className="text-left py-2 border-b border-neutral-100">Garten-Shop</button>
             {user ? (
@@ -1018,7 +1018,7 @@ export default function HofladenWebAppStartseite() {
     return (
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-green-950">Magazin & Ratgeber</h1>
+          <h1 className="text-4xl font-extrabold text-green-950">Block</h1>
           <p className="text-neutral-600 mt-2 max-w-md mx-auto">Hilfreiche DIY-Projekte, Garten-Guides und Wissenswertes über Natur & Imkerei.</p>
         </div>
 
@@ -1092,14 +1092,14 @@ export default function HofladenWebAppStartseite() {
   const renderBlogDetail = () => {
     const post = blogs.find(p => p.slug === viewParams.slug);
 
-    if (!post) return <div className="text-center py-20 text-neutral-500">Blogbeitrag wird geladen...</div>;
+    if (!post) return <div className="text-center py-20 text-neutral-500">Blockbeitrag wird geladen...</div>;
 
     const isBookmarked = readingList.some(r => r.id === post.id);
 
     return (
       <motion.article initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
         <Button variant="ghost" onClick={() => navigateTo("blog")} className="mb-4">
-          &larr; Zurück zum Blog
+          &larr; Zurück zum Block
         </Button>
 
         <Card className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white">
@@ -1666,7 +1666,7 @@ export default function HofladenWebAppStartseite() {
               <Card className="p-8 text-center bg-white border border-neutral-100 rounded-2xl">
                 <Bookmark className="h-12 w-12 text-neutral-300 mx-auto mb-2" />
                 <div className="font-semibold text-neutral-600">Deine Leseliste ist noch leer</div>
-                <p className="text-neutral-400 text-sm mt-1">Sichere dir DIY-Projekte oder Ratgeber im Blog, um sie später hier abzurufen.</p>
+                <p className="text-neutral-400 text-sm mt-1">Sichere dir DIY-Projekte oder Ratgeber im Block, um sie später hier abzurufen.</p>
               </Card>
             )}
           </div>
@@ -2055,7 +2055,7 @@ export default function HofladenWebAppStartseite() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold text-green-950">Betreiber-Adminbereich</h1>
-        <p className="text-neutral-500">Freigaben verwalten, Benutzerkonten einsehen und Blogartikel verfassen.</p>
+        <p className="text-neutral-500">Freigaben verwalten, Benutzerkonten einsehen und Blockartikel verfassen.</p>
       </div>
 
       {adminSuccess && <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl text-sm font-medium">{adminSuccess}</div>}
@@ -2078,7 +2078,7 @@ export default function HofladenWebAppStartseite() {
           onClick={() => setAdminTab("blogs")}
           className={`py-3 px-5 font-bold text-sm border-b-2 transition ${adminTab === 'blogs' ? 'border-green-800 text-green-900' : 'border-transparent text-neutral-500'}`}
         >
-          Blog-Management
+          Block-Management
         </button>
       </div>
 
@@ -2305,7 +2305,7 @@ export default function HofladenWebAppStartseite() {
             className={`flex flex-col items-center gap-1 ${view === 'blog' ? 'text-green-800 font-bold' : ''}`}
             onClick={() => navigateTo("blog")}
           >
-            <FileText className="h-6 w-6" />Blog
+            <FileText className="h-6 w-6" />Block
           </button>
           
           <button 
@@ -2324,7 +2324,7 @@ export default function HofladenWebAppStartseite() {
           <div className="flex gap-4">
             <button onClick={() => navigateTo("home")} className="hover:underline">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="hover:underline">Events</button>
-            <button onClick={() => navigateTo("blog")} className="hover:underline">Blog</button>
+            <button onClick={() => navigateTo("blog")} className="hover:underline">Block</button>
             <button onClick={() => navigateTo("cookbook")} className="hover:underline">Kochbuch</button>
             <button onClick={() => navigateTo("affiliates")} className="hover:underline">Gartenshop</button>
             <button onClick={() => navigateTo("login")} className="hover:underline">Anbieter-Portal</button>
