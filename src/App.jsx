@@ -1415,7 +1415,7 @@ export default function HofladenWebAppStartseite() {
               <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
                 <div className="text-left">
                   <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
-                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Gelistete Hofläden etc.</div>
+                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Hofläden</div>
                 </div>
                 <div className="text-left border-l border-neutral-100 pl-4">
                   <div className="text-3xl font-extrabold text-green-900">1.284</div>
@@ -2520,7 +2520,7 @@ export default function HofladenWebAppStartseite() {
             <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
               <div className="text-left">
                 <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
-                <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Gelistete Hofläden etc.</div>
+                <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Hofläden</div>
               </div>
               <div className="text-left border-l border-neutral-100 pl-4">
                 <div className="text-3xl font-extrabold text-green-900">1.284</div>
