@@ -920,13 +920,13 @@ export default function HofladenWebAppStartseite() {
   const renderMapPreview = () => {
     const validPlaces = displayedPlaces.filter(p => p.lat && p.lng);
 
-    // Calculate map zoom based on search radius (in km)
     let mapZoom = 11;
     if (searchRadius === "2") mapZoom = 14;
     else if (searchRadius === "5") mapZoom = 13;
     else if (searchRadius === "10") mapZoom = 11;
     else if (searchRadius === "25") mapZoom = 9;
     else if (searchRadius === "50") mapZoom = 8;
+    else if (searchRadius === "DE") mapZoom = 6;
 
     return (
       <div className="relative h-[330px] overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-[#e8f1e5] shadow-sm md:h-[420px] z-10">
@@ -952,21 +952,23 @@ export default function HofladenWebAppStartseite() {
                   <div className="p-1 space-y-1 max-w-[180px] text-neutral-800 text-center">
                     <h3 className="font-bold text-sm text-neutral-900 leading-tight">Dein Suchstandort</h3>
                     <p className="text-xs text-neutral-500">{searchPlz}</p>
-                    <p className="text-[10px] text-neutral-400">Suchkreis: {searchRadius} km</p>
+                    <p className="text-[10px] text-neutral-400">Suchkreis: {searchRadius === "DE" ? "Ganz Deutschland" : `${searchRadius} km`}</p>
                   </div>
                 </Popup>
               </Marker>
-              <Circle
-                center={plzCoordinates}
-                radius={parseInt(searchRadius) * 1000}
-                pathOptions={{ 
-                  fillColor: '#166534', 
-                  fillOpacity: 0.08, 
-                  color: '#166534', 
-                  weight: 1.5, 
-                  dashArray: '5, 5' 
-                }}
-              />
+              {searchRadius !== "DE" && (
+                <Circle
+                  center={plzCoordinates}
+                  radius={parseInt(searchRadius) * 1000}
+                  pathOptions={{ 
+                    fillColor: '#166534', 
+                    fillOpacity: 0.08, 
+                    color: '#166534', 
+                    weight: 1.5, 
+                    dashArray: '5, 5' 
+                  }}
+                />
+              )}
             </>
           )}
 
@@ -1128,6 +1130,7 @@ export default function HofladenWebAppStartseite() {
                 <option value="10">10 km</option>
                 <option value="25">25 km</option>
                 <option value="50">50 km</option>
+                <option value="DE">Ganz DE</option>
               </select>
             </div>
 

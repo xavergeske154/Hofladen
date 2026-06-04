@@ -315,8 +315,11 @@ app.get('/api/farm-shops', (req, res) => {
           distance: `${distanceNum.toFixed(1)} km`
         };
       });
-      // Filter by radius limit
-      publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+      // Filter by radius limit (only if radius is not "DE")
+      if (radius !== "DE") {
+        const rKm = parseInt(radius) || 10;
+        publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+      }
     } else {
       // Fallback if postcode coordinates are not found in DB
       publicShops = publicShops.map(shop => {
@@ -330,8 +333,11 @@ app.get('/api/farm-shops', (req, res) => {
           distance: `${distanceNum.toFixed(1)} km`
         };
       });
-      // Filter by radius limit
-      publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+      // Filter by radius limit (only if radius is not "DE")
+      if (radius !== "DE") {
+        const rKm = parseInt(radius) || 10;
+        publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+      }
     }
   }
 
