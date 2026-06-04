@@ -10,6 +10,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
 
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+
 const categories = [
   { id: "all", label: "Alle", icon: Store },
   { id: "hofladen", label: "Hofladen", icon: Home },
@@ -32,6 +36,48 @@ function Logo({ onClick }) {
   );
 }
 
+// Helper component to change map viewport when center coordinate state updates
+function ChangeMapCenter({ center }) {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, map.getZoom());
+    }
+  }, [center, map]);
+  return null;
+}
+
+// Category Specific Leaflet Icons
+const getMarkerIcon = (category) => {
+  let color = "bg-green-800";
+  let iconHtml = "";
+
+  if (category === "hofladen") {
+    color = "bg-green-800";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+  } else if (category === "milch") {
+    color = "bg-blue-600";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-milk"><path d="M8 2h8"/><path d="M9 2v2.78c0 .26.11.51.3.7l3.4 3.4c.19.19.3.44.3.7V20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V9.58c0-.26.11-.51.3-.7l3.4-3.4c.19-.19.3-.44.3-.7V2"/><path d="M6 12h12"/><path d="M6 16h12"/></svg>`;
+  } else if (category === "eier") {
+    color = "bg-amber-800";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-2.7-10-8-10S4 8.5 4 14a8 8 0 0 0 8 8z"/></svg>`;
+  } else if (category === "automat") {
+    color = "bg-orange-500";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
+  } else {
+    color = "bg-green-700";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
+  }
+
+  return L.divIcon({
+    html: `<div class="flex h-10 w-10 items-center justify-center rounded-t-full rounded-bl-full ${color} -rotate-45 shadow-md text-white border-2 border-white"><div class="rotate-45">${iconHtml}</div></div>`,
+    className: "custom-leaflet-icon",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40]
+  });
+};
+
 export default function HofladenWebAppStartseite() {
   // Navigation State
   const [view, setView] = useState("home"); // home, farm-detail, blog, blog-detail, login, register, dashboard, events, cookbook, affiliates
@@ -43,6 +89,36 @@ export default function HofladenWebAppStartseite() {
   // Data States
   const [places, setPlaces] = useState([]);
   const [blogs, setBlogs] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [readingList, setReadingList] = useState([]);
+
+  // Auto-center map based on places search results coordinates
+  const mapCenter = useMemo(() => {
+    const validPlaces = places.filter(p => p.lat && p.lng);
+    if (validPlaces.length > 0) {
+      const sumLat = validPlaces.reduce((sum, p) => sum + p.lat, 0);
+      const sumLng = validPlaces.reduce((sum, p) => sum + p.lng, 0);
+      return [sumLat / validPlaces.length, sumLng / validPlaces.length];
+    }
+    return [48.0779, 11.9715]; // Default: Ebersberg
+  }, [places]);
+
+  const handleOpenMapRoute = (address) => {
+    const encodedAddress = encodeURIComponent(address);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    if (isIOS) {
+      const confirmAppleMaps = window.confirm("Möchtest du die Navigation in Apple Maps öffnen? (Abbrechen für Google Maps)");
+      if (confirmAppleMaps) {
+        window.open(`maps://?daddr=${encodedAddress}`, "_blank");
+      } else {
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, "_blank");
+      }
+    } else {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`, "_blank");
+    }
+  };
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -57,10 +133,6 @@ export default function HofladenWebAppStartseite() {
   const [authRole, setAuthRole] = useState("customer");
   const [authError, setAuthError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
-
-  // Customer Favorites & Reading list State
-  const [favorites, setFavorites] = useState([]);
-  const [readingList, setReadingList] = useState([]);
 
   // Blog States
   const [selectedBlogCat, setSelectedBlogCat] = useState("all");
@@ -677,46 +749,68 @@ export default function HofladenWebAppStartseite() {
     </header>
   );
 
-  // Map Preview Widget
+  // Map Preview Widget (Interactive Leaflet Map)
   const renderMapPreview = () => {
-    const pins = [
-      { top: "18%", left: "23%", color: "bg-green-800", icon: Store },
-      { top: "34%", left: "14%", color: "bg-amber-800", icon: Egg },
-      { top: "25%", left: "70%", color: "bg-blue-600", icon: Milk },
-      { top: "52%", left: "78%", color: "bg-green-700", icon: Store },
-      { top: "60%", left: "26%", color: "bg-green-800", icon: Store },
-      { top: "67%", left: "68%", color: "bg-orange-500", icon: Store },
-    ];
+    const validPlaces = places.filter(p => p.lat && p.lng);
 
     return (
-      <div className="relative h-[330px] overflow-hidden rounded-[2rem] bg-[#e8f1e5] shadow-inner md:h-[420px]">
-        <div className="absolute inset-0 opacity-80" style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 30%, rgba(88,129,87,.18) 0 12%, transparent 13%), radial-gradient(circle at 78% 25%, rgba(68,137,185,.15) 0 10%, transparent 11%), radial-gradient(circle at 60% 70%, rgba(234,145,42,.14) 0 12%, transparent 13%), linear-gradient(35deg, transparent 0 22%, rgba(255,255,255,.55) 23% 24%, transparent 25% 46%, rgba(255,255,255,.45) 47% 48%, transparent 49%)"
-        }} />
-        <div className="absolute left-[8%] top-[72%] h-2 w-[86%] rotate-[-8deg] rounded-full bg-white/70" />
-        <div className="absolute left-[10%] top-[40%] h-2 w-[88%] rotate-[16deg] rounded-full bg-white/70" />
-        <div className="absolute left-[50%] top-[48%] flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-blue-500/15">
-          <div className="h-5 w-5 rounded-full border-4 border-white bg-blue-500 shadow-lg" />
-        </div>
-        {pins.map((pin, index) => {
-          const Icon = pin.icon;
-          return (
-            <motion.div
-              key={index}
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: index * 0.08 }}
-              className={`absolute flex h-12 w-12 items-center justify-center rounded-t-full rounded-bl-full ${pin.color} -rotate-45 shadow-lg`}
-              style={{ top: pin.top, left: pin.left }}
+      <div className="relative h-[330px] overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-[#e8f1e5] shadow-sm md:h-[420px] z-10">
+        <MapContainer 
+          center={mapCenter} 
+          zoom={11} 
+          scrollWheelZoom={true} 
+          style={{ height: "100%", width: "100%" }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          />
+          <ChangeMapCenter center={mapCenter} />
+          {validPlaces.map(place => (
+            <Marker 
+              key={place.id} 
+              position={[place.lat, place.lng]} 
+              icon={getMarkerIcon(place.category)}
             >
-              <Icon className="h-6 w-6 rotate-45 text-white" />
-            </motion.div>
-          );
-        })}
-        <Button className="absolute bottom-6 right-6 rounded-full bg-white px-5 py-6 text-neutral-800 shadow-lg hover:bg-white">
-          <MapPin className="mr-2 h-5 w-5" /> In diesem Bereich suchen
-        </Button>
+              <Popup className="custom-popup">
+                <div className="p-1 space-y-2 max-w-[200px] text-neutral-800">
+                  <h3 className="font-bold text-sm text-neutral-900 leading-tight">{place.name}</h3>
+                  <p className="text-xs text-green-800 font-semibold">{place.type}</p>
+                  <p className="text-[11px] text-neutral-500 leading-normal">{place.address}</p>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                    <span className="text-xs font-bold text-neutral-700">{place.rating}</span>
+                    <span className="text-[10px] text-neutral-400">({place.reviews})</span>
+                  </div>
+                  <div className="flex gap-2 pt-2 border-t border-neutral-100 mt-2">
+                    <button 
+                      className="text-[10px] h-7 px-3 bg-green-800 hover:bg-green-900 rounded-full font-bold text-white transition flex-1 text-center cursor-pointer"
+                      onClick={() => navigateTo("farm-detail", { id: place.id })}
+                    >
+                      Details
+                    </button>
+                    <button 
+                      className="text-[10px] h-7 px-3 rounded-full border border-neutral-300 font-bold hover:bg-neutral-50 transition flex-1 text-center text-neutral-700 cursor-pointer"
+                      onClick={() => handleOpenMapRoute(place.address)}
+                    >
+                      Route
+                    </button>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+        
+        {/* Floating map search helper */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000]">
+          <Button 
+            className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-neutral-800 shadow-md hover:bg-neutral-50 flex items-center gap-1.5 border border-neutral-200"
+            onClick={() => { setSearchQuery(searchInput); setSearchPlz(plzInput); }}
+          >
+            <MapPin className="h-4 w-4 text-green-800" /> In diesem Bereich suchen
+          </Button>
+        </div>
       </div>
     );
   };

@@ -14,6 +14,34 @@ app.use(express.json());
 // Password Hashing Helper
 const hashPassword = (password) => Buffer.from(password).toString('base64');
 
+// Mock Geocoding Helper to resolve Lat/Lng from address/postcode
+const geocodeAddress = (address) => {
+  if (!address) return { lat: 48.0779, lng: 11.9715 };
+  const cleanAddr = address.toLowerCase();
+  
+  if (cleanAddr.includes("ebersberg") || cleanAddr.includes("85560")) {
+    return { lat: 48.0779 + (Math.random() - 0.5) * 0.01, lng: 11.9715 + (Math.random() - 0.5) * 0.01 };
+  }
+  if (cleanAddr.includes("zorneding") || cleanAddr.includes("85604")) {
+    return { lat: 48.0827 + (Math.random() - 0.5) * 0.01, lng: 11.8267 + (Math.random() - 0.5) * 0.01 };
+  }
+  if (cleanAddr.includes("grafing") || cleanAddr.includes("85567")) {
+    return { lat: 48.0478 + (Math.random() - 0.5) * 0.01, lng: 11.9664 + (Math.random() - 0.5) * 0.01 };
+  }
+  
+  let hash = 0;
+  for (let i = 0; i < address.length; i++) {
+    hash = address.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const latOffset = ((hash % 100) / 1000) - 0.05; 
+  const lngOffset = (((hash >> 8) % 100) / 1000) - 0.05; 
+  
+  return {
+    lat: 48.1371 + latOffset,
+    lng: 11.5754 + lngOffset
+  };
+};
+
 // Authentication middleware
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -99,6 +127,8 @@ app.post('/api/auth/register', (req, res) => {
       category: 'hofladen',
       distance: '0,0 km',
       address: '',
+      lat: 48.0779,
+      lng: 11.9715,
       hours: 'Geschlossen',
       status: 'Geschlossen',
       rating: '5.0',
@@ -337,7 +367,12 @@ app.put('/api/vendor/profile', authenticateToken, authorizeRole(['vendor']), (re
   // Update Farm Shop
   farmShop.name = name || farmShop.name;
   farmShop.description = description !== undefined ? description : farmShop.description;
-  farmShop.address = address !== undefined ? address : farmShop.address;
+  if (address !== undefined && address !== farmShop.address) {
+    farmShop.address = address;
+    const coords = geocodeAddress(address);
+    farmShop.lat = coords.lat;
+    farmShop.lng = coords.lng;
+  }
   farmShop.hours = hours !== undefined ? hours : farmShop.hours;
   farmShop.category = category || farmShop.category;
   farmShop.status = status || farmShop.status;
