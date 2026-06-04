@@ -911,6 +911,12 @@ export default function HofladenWebAppStartseite() {
                     onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
                     className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
                   >
+                    <User className="h-4 w-4 text-neutral-500" /> Konto
+                  </button>
+                  <button 
+                    onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
+                  >
                     <Heart className="h-4 w-4 text-red-500 fill-red-500" /> Favoriten
                   </button>
                   <button 
@@ -924,7 +930,7 @@ export default function HofladenWebAppStartseite() {
                       onClick={() => { setProfileDropdownOpen(false); handleLogout(); }} 
                       className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-red-600 font-semibold flex items-center gap-2 border-t border-neutral-100"
                     >
-                      <LogOut className="h-4 w-4" /> Abmelden
+                      <LogOut className="h-4 w-4" /> Logout
                     </button>
                   )}
                 </div>
