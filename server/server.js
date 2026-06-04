@@ -268,8 +268,39 @@ app.get('/api/farm-shops', (req, res) => {
 
   // Real Distance / PLZ Search filter using Haversine formula
   if (plz) {
-    const cleanPlz = plz.trim().padStart(5, '0');
-    const plzEntry = plzDatabase[cleanPlz];
+    const query = plz.trim();
+    let plzEntry = null;
+
+    // Check if numeric (postcode)
+    if (/^\d+$/.test(query)) {
+      const cleanPlz = query.padStart(5, '0');
+      plzEntry = plzDatabase[cleanPlz];
+    } else {
+      // Search by city/municipality name in plzDatabase
+      const queryLower = query.toLowerCase();
+      const keys = Object.keys(plzDatabase);
+      
+      // Try exact city/district match
+      let foundKey = keys.find(k => {
+        const entry = plzDatabase[k];
+        return (entry.city && entry.city.toLowerCase() === queryLower) ||
+               (entry.district && entry.district.toLowerCase() === queryLower);
+      });
+      
+      // Try partial match
+      if (!foundKey) {
+        foundKey = keys.find(k => {
+          const entry = plzDatabase[k];
+          return (entry.city && entry.city.toLowerCase().includes(queryLower)) ||
+                 (entry.district && entry.district.toLowerCase().includes(queryLower));
+        });
+      }
+      
+      if (foundKey) {
+        plzEntry = plzDatabase[foundKey];
+      }
+    }
+
     const rKm = parseInt(radius) || 10;
     
     if (plzEntry && plzEntry.lat && plzEntry.lng) {
@@ -307,22 +338,67 @@ app.get('/api/farm-shops', (req, res) => {
   res.json(publicShops);
 });
 
-// Endpoint for geocoding / looking up coordinates of any German postcode
-app.get('/api/plz/:plz', (req, res) => {
-  const plzParam = req.params.plz.trim().padStart(5, '0');
-  const plzEntry = plzDatabase[plzParam];
-  if (plzEntry) {
-    res.json({
-      plz: plzParam,
-      lat: plzEntry.lat,
-      lng: plzEntry.lng,
-      state: plzEntry.state,
-      district: plzEntry.district,
-      type: plzEntry.type
-    });
+// Endpoint for geocoding / looking up coordinates of any German postcode or city
+app.get('/api/plz/:query', (req, res) => {
+  const queryParam = req.params.query.trim().toLowerCase();
+  
+  if (/^\d+$/.test(queryParam)) {
+    const plzParam = queryParam.padStart(5, '0');
+    const plzEntry = plzDatabase[plzParam];
+    if (plzEntry) {
+      return res.json({
+        plz: plzParam,
+        city: plzEntry.city || plzEntry.district || plzEntry.state,
+        lat: plzEntry.lat,
+        lng: plzEntry.lng,
+        state: plzEntry.state,
+        district: plzEntry.district,
+        type: plzEntry.type
+      });
+    }
   } else {
-    res.status(404).json({ error: 'Postleitzahl nicht gefunden' });
+    const keys = Object.keys(plzDatabase);
+    
+    // Exact match
+    for (const key of keys) {
+      const entry = plzDatabase[key];
+      const matchCity = entry.city && entry.city.toLowerCase() === queryParam;
+      const matchDistrict = entry.district && entry.district.toLowerCase() === queryParam;
+      
+      if (matchCity || matchDistrict) {
+        return res.json({
+          plz: key,
+          city: entry.city || entry.district,
+          lat: entry.lat,
+          lng: entry.lng,
+          state: entry.state,
+          district: entry.district,
+          type: entry.type
+        });
+      }
+    }
+    
+    // Partial match
+    for (const key of keys) {
+      const entry = plzDatabase[key];
+      const matchCity = entry.city && entry.city.toLowerCase().includes(queryParam);
+      const matchDistrict = entry.district && entry.district.toLowerCase().includes(queryParam);
+      
+      if (matchCity || matchDistrict) {
+        return res.json({
+          plz: key,
+          city: entry.city || entry.district,
+          lat: entry.lat,
+          lng: entry.lng,
+          state: entry.state,
+          district: entry.district,
+          type: entry.type
+        });
+      }
+    }
   }
+  
+  res.status(404).json({ error: 'Postleitzahl oder Ort nicht gefunden' });
 });
 
 app.get('/api/farm-shops/:id', (req, res) => {
