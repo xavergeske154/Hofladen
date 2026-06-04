@@ -92,6 +92,13 @@ export default function HofladenWebAppStartseite() {
   const [favorites, setFavorites] = useState([]);
   const [readingList, setReadingList] = useState([]);
 
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [searchPlz, setSearchPlz] = useState("");
+  const [plzInput, setPlzInput] = useState("");
+  const [searchRadius, setSearchRadius] = useState("10"); // 2, 5, 10, 25, 50 km
+
   // Postcode Coordinates State to allow centering on searched PLZ even if empty
   const [plzCoordinates, setPlzCoordinates] = useState(null);
 
@@ -148,13 +155,6 @@ export default function HofladenWebAppStartseite() {
     }
   };
 
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [searchPlz, setSearchPlz] = useState("");
-  const [plzInput, setPlzInput] = useState("");
-  const [searchRadius, setSearchRadius] = useState("10"); // 2, 5, 10, 25, 50 km
-  
   // Form/Auth States
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
