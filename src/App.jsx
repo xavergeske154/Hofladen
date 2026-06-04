@@ -127,6 +127,51 @@ export default function HofladenWebAppStartseite() {
     fetchUser();
   }, []);
 
+  // Handle hash routing for deep linking and back/forward browser navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash.startsWith("#/blog-detail/")) {
+        const slug = hash.replace("#/blog-detail/", "");
+        setView("blog-detail");
+        setViewParams({ slug });
+      } else if (hash.startsWith("#/farm-detail/")) {
+        const id = parseInt(hash.replace("#/farm-detail/", ""), 10);
+        setView("farm-detail");
+        setViewParams({ id });
+      } else if (hash === "#/blog") {
+        setView("blog");
+        setViewParams({});
+      } else if (hash === "#/events") {
+        setView("events");
+        setViewParams({});
+      } else if (hash === "#/cookbook") {
+        setView("cookbook");
+        setViewParams({});
+      } else if (hash === "#/affiliates") {
+        setView("affiliates");
+        setViewParams({});
+      } else if (hash === "#/dashboard") {
+        setView("dashboard");
+        setViewParams({});
+      } else if (hash === "#/login") {
+        setView("login");
+        setViewParams({});
+      } else if (hash === "#/register") {
+        setView("register");
+        setViewParams({});
+      } else if (hash === "#/" || hash === "") {
+        setView("home");
+        setViewParams({});
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange(); // Run once on initialization
+
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
   // Fetch Public Farm Shops with Radius PLZ filter & Blogs & Events
   useEffect(() => {
     const loadShops = async () => {
@@ -217,6 +262,22 @@ export default function HofladenWebAppStartseite() {
     window.scrollTo(0, 0);
     if (newView === "register" && params.role) {
       setAuthRole(params.role);
+    }
+
+    // Update window.location.hash for shareable links
+    let targetHash = "";
+    if (newView === "blog-detail") {
+      targetHash = `#/blog-detail/${params.slug}`;
+    } else if (newView === "farm-detail") {
+      targetHash = `#/farm-detail/${params.id}`;
+    } else if (newView === "home") {
+      targetHash = `#/`;
+    } else {
+      targetHash = `#/${newView}`;
+    }
+
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash;
     }
   };
 
