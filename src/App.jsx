@@ -1381,13 +1381,52 @@ export default function HofladenWebAppStartseite() {
         </div>
 
         <aside id="anbieter" className="space-y-4">
-          <Card className="rounded-[2rem] border-green-100 bg-green-900 text-white shadow-sm overflow-hidden">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-100">Regional & Frisch</div>
-              <h3 className="text-2xl font-bold">Hofladen-Finder</h3>
-              <p className="mt-4 text-sm leading-relaxed text-green-50">
-                Unterstütze die Landwirtschaft in deiner Region! Entdecke frische Milch, Eier, Gemüse und handgemachte Produkte direkt ab Hof. Alle Stationen bieten kurze Transportwege und maximale Frische.
-              </p>
+          <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden">
+            <CardContent className="p-6 space-y-4">
+              <div>
+                <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Spenden & Erhalt</div>
+                <h3 className="text-xl font-bold text-green-950 mt-1">Unterstütze uns</h3>
+                <p className="mt-2 text-xs leading-relaxed text-neutral-600">
+                  Hofladen-Finder ist kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
+                </p>
+              </div>
+
+              {/* Four custom tiers in small list layout */}
+              <div className="space-y-2 pt-2">
+                {[
+                  { icon: "☕", title: "Kaffee ausgeben", price: "3 €" },
+                  { icon: "🥚", title: "Frühstück unterstützen", price: "5 €" },
+                  { icon: "🥔", title: "Regionalförderer", price: "10 €" },
+                  { icon: "🌻", title: "Projektförderer", price: "25 €" }
+                ].map(opt => (
+                  <button 
+                    key={opt.title}
+                    onClick={() => {
+                      alert(`Vielen Dank für deine Unterstützung über ${opt.price}! Weiterleitung zu PayPal...`);
+                    }}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-neutral-100 hover:border-green-800/20 hover:bg-green-50/20 active:scale-[0.98] transition text-left cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2 text-xs font-semibold text-neutral-800">
+                      <span className="text-sm">{opt.icon}</span>
+                      {opt.title}
+                    </span>
+                    <span className="text-xs font-black text-green-900 bg-green-50 px-2 py-0.5 rounded-md border border-green-700/10">{opt.price}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Progress info */}
+              <div className="text-[10px] text-neutral-500 font-bold text-center border-t border-neutral-100 pt-3">
+                Bereits unterstützt von 127 Hofladen-Freunden (25.4% des Ziels)
+              </div>
+
+              <Button 
+                variant="outline"
+                className="w-full rounded-full text-xs font-bold py-5 mt-2 cursor-pointer" 
+                onClick={() => navigateTo("support")}
+              >
+                Mehr erfahren
+              </Button>
             </CardContent>
           </Card>
 
@@ -2425,6 +2464,56 @@ export default function HofladenWebAppStartseite() {
                 </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Mini Sponsorship Card */}
+        <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden text-left">
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Spenden & Erhalt</div>
+              <h3 className="text-lg font-bold text-green-950 mt-1">Unterstütze uns</h3>
+              <p className="mt-2 text-xs leading-relaxed text-neutral-600">
+                Hofladen-Finder ist kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
+              </p>
+            </div>
+
+            {/* Four custom tiers in small list layout */}
+            <div className="space-y-2 pt-2">
+              {[
+                { icon: "☕", title: "Kaffee ausgeben", price: "3 €" },
+                { icon: "🥚", title: "Frühstück unterstützen", price: "5 €" },
+                { icon: "🥔", title: "Regionalförderer", price: "10 €" },
+                { icon: "🌻", title: "Projektförderer", price: "25 €" }
+              ].map(opt => (
+                <button 
+                  key={opt.title}
+                  onClick={() => {
+                    alert(`Vielen Dank für deine Unterstützung über ${opt.price}! Weiterleitung zu PayPal...`);
+                  }}
+                  className="w-full flex items-center justify-between p-2 rounded-xl border border-neutral-100 hover:border-green-800/20 hover:bg-green-50/20 active:scale-[0.98] transition text-left cursor-pointer"
+                >
+                  <span className="flex items-center gap-2 text-xs font-semibold text-neutral-800">
+                    <span className="text-sm">{opt.icon}</span>
+                    {opt.title}
+                  </span>
+                  <span className="text-xs font-black text-green-900 bg-green-50 px-2 py-0.5 rounded-md border border-green-700/10">{opt.price}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Progress info */}
+            <div className="text-[10px] text-neutral-500 font-bold text-center border-t border-neutral-100 pt-3">
+              Bereits unterstützt von 127 Hofladen-Freunden (25.4% des Ziels)
+            </div>
+
+            <Button 
+              variant="outline"
+              className="w-full rounded-full text-xs font-bold py-5 mt-2 cursor-pointer" 
+              onClick={() => navigateTo("support")}
+            >
+              Mehr erfahren
+            </Button>
           </CardContent>
         </Card>
       </aside>
