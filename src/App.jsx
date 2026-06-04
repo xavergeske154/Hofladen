@@ -1581,6 +1581,17 @@ export default function HofladenWebAppStartseite() {
     const totalPages = Math.max(1, Math.ceil(displayedPlaces.length / itemsPerPage));
     const paginatedPlaces = displayedPlaces.slice((farmPage - 1) * itemsPerPage, farmPage * itemsPerPage);
 
+    const scrollToResults = () => {
+      setTimeout(() => {
+        const el = document.getElementById("results-header");
+        if (el) {
+          const yOffset = -100; // Account for the sticky top header
+          const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 50);
+    };
+
     return (
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Title section */}
@@ -1704,7 +1715,7 @@ export default function HofladenWebAppStartseite() {
         <section className="mt-4 space-y-8">
           <div>
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-green-950">Ergebnisse ({displayedPlaces.length})</h2>
+              <h2 id="results-header" className="text-3xl font-bold text-green-950">Ergebnisse ({displayedPlaces.length})</h2>
               {searchQuery || selectedCategory !== 'all' || searchPlz || filterOpenNow || filterVending247 || filterFavorites ? (
                 <Button 
                   variant="ghost" 
@@ -1748,7 +1759,7 @@ export default function HofladenWebAppStartseite() {
                 disabled={farmPage === 1}
                 onClick={() => {
                   setFarmPage(prev => Math.max(1, prev - 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollToResults();
                 }}
                 className="rounded-full px-4 border-neutral-300 font-bold cursor-pointer"
               >
@@ -1760,7 +1771,7 @@ export default function HofladenWebAppStartseite() {
                     key={p}
                     onClick={() => {
                       setFarmPage(p);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      scrollToResults();
                     }}
                     className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer ${
                       farmPage === p
@@ -1778,7 +1789,7 @@ export default function HofladenWebAppStartseite() {
                 disabled={farmPage === totalPages}
                 onClick={() => {
                   setFarmPage(prev => Math.min(totalPages, prev + 1));
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollToResults();
                 }}
                 className="rounded-full px-4 border-neutral-300 font-bold cursor-pointer"
               >
