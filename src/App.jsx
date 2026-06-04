@@ -80,6 +80,97 @@ const getMarkerIcon = (category) => {
   });
 };
 
+const calculateDistanceClient = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
+// Opening Hours parser helper
+const isShopOpenNow = (shop) => {
+  if (!shop.hours) return false;
+  const hoursStr = shop.hours.trim();
+  
+  if (hoursStr.toLowerCase().includes("24/7") || hoursStr.toLowerCase().includes("rund um die uhr")) {
+    return true;
+  }
+
+  const now = new Date();
+  const currentDayIndex = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const currentHour = now.getHours();
+  const currentMin = now.getMinutes();
+  const currentTimeVal = currentHour * 60 + currentMin;
+
+  const germanDays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+  const currentDayAbbr = germanDays[currentDayIndex];
+
+  const timeToMinutes = (tStr) => {
+    const parts = tStr.split(':');
+    if (parts.length >= 2) {
+      return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    }
+    return 0;
+  };
+
+  if (hoursStr.includes("Heute")) {
+    const rangeMatch = hoursStr.match(/(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})/);
+    if (rangeMatch) {
+      const startMin = timeToMinutes(rangeMatch[1]);
+      const endMin = timeToMinutes(rangeMatch[2]);
+      return currentTimeVal >= startMin && currentTimeVal <= endMin;
+    }
+    const bisMatch = hoursStr.match(/bis\s*(\d{2}:\d{2})/);
+    if (bisMatch) {
+      const endMin = timeToMinutes(bisMatch[1]);
+      const startMin = 8 * 60; // Assume opens at 08:00 by default
+      return currentTimeVal >= startMin && currentTimeVal <= endMin;
+    }
+    return true;
+  }
+
+  const timeRangeMatch = hoursStr.match(/(\d{2}:\d{2})\s*[–-]\s*(\d{2}:\d{2})/);
+  if (timeRangeMatch) {
+    const startMin = timeToMinutes(timeRangeMatch[1]);
+    const endMin = timeToMinutes(timeRangeMatch[2]);
+    
+    if (hoursStr.includes(currentDayAbbr)) {
+      return currentTimeVal >= startMin && currentTimeVal <= endMin;
+    }
+
+    const rangeDayMatch = hoursStr.match(/([A-Z][a-z])\s*-\s*([A-Z][a-z])/);
+    if (rangeDayMatch) {
+      const startDayAbbr = rangeDayMatch[1];
+      const endDayAbbr = rangeDayMatch[2];
+      const startDayIdx = germanDays.indexOf(startDayAbbr);
+      const endDayIdx = germanDays.indexOf(endDayAbbr);
+      
+      if (startDayIdx !== -1 && endDayIdx !== -1) {
+        let isDayInRange = false;
+        if (startDayIdx <= endDayIdx) {
+          isDayInRange = currentDayIndex >= startDayIdx && currentDayIndex <= endDayIdx;
+        } else {
+          isDayInRange = currentDayIndex >= startDayIdx || currentDayIndex <= endDayIdx;
+        }
+        if (isDayInRange) {
+          return currentTimeVal >= startMin && currentTimeVal <= endMin;
+        }
+      }
+    }
+  }
+
+  if (hoursStr.toLowerCase().includes("geöffnet")) {
+    return true;
+  }
+
+  return false;
+};
+
 export default function HofladenWebAppStartseite() {
   // Navigation State
   const [view, setView] = useState("home"); // home, farm-detail, blog, blog-detail, login, register, dashboard, events, cookbook, affiliates
@@ -103,6 +194,51 @@ export default function HofladenWebAppStartseite() {
 
   // Postcode Coordinates State to allow centering on searched PLZ even if empty
   const [plzCoordinates, setPlzCoordinates] = useState(null);
+
+  const [filterOpenNow, setFilterOpenNow] = useState(false);
+  const [filterVending247, setFilterVending247] = useState(false);
+  const [filterFavorites, setFilterFavorites] = useState(false);
+
+  const displayedPlaces = useMemo(() => {
+    let result = [];
+    
+    if (filterFavorites) {
+      const searchCenter = plzCoordinates || [48.0779, 11.9715];
+      result = favorites.map(fav => {
+        let distanceNum = 999;
+        if (fav.lat && fav.lng) {
+          distanceNum = calculateDistanceClient(searchCenter[0], searchCenter[1], fav.lat, fav.lng);
+        }
+        return {
+          ...fav,
+          distanceNum,
+          distance: `${distanceNum.toFixed(1)} km`
+        };
+      });
+    } else {
+      result = [...places];
+    }
+
+    if (filterVending247) {
+      result = result.filter(p => 
+        p.category === 'automat' || 
+        (p.hours && p.hours.toLowerCase().includes("24/7"))
+      );
+    }
+
+    if (filterOpenNow) {
+      result = result.filter(p => isShopOpenNow(p));
+    }
+
+    // Sort by distanceNum (closest first)
+    result.sort((a, b) => {
+      const distA = a.distanceNum !== undefined ? a.distanceNum : 999;
+      const distB = b.distanceNum !== undefined ? b.distanceNum : 999;
+      return distA - distB;
+    });
+
+    return result;
+  }, [places, favorites, filterFavorites, filterVending247, filterOpenNow, plzCoordinates]);
 
   useEffect(() => {
     if (searchPlz) {
@@ -782,7 +918,7 @@ export default function HofladenWebAppStartseite() {
 
   // Map Preview Widget (Interactive Leaflet Map)
   const renderMapPreview = () => {
-    const validPlaces = places.filter(p => p.lat && p.lng);
+    const validPlaces = displayedPlaces.filter(p => p.lat && p.lng);
 
     // Calculate map zoom based on search radius (in km)
     let mapZoom = 11;
@@ -1003,10 +1139,37 @@ export default function HofladenWebAppStartseite() {
             </Button>
           </div>
           
-          <div className="mt-5 flex flex-wrap gap-3 text-sm text-neutral-600">
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm border border-neutral-100">Jetzt geöffnet</span>
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm border border-neutral-100">24/7 Automaten</span>
-            <span className="rounded-full bg-white px-4 py-2 shadow-sm border border-neutral-100">Favoriten speichern</span>
+          <div className="mt-5 flex flex-wrap gap-3 text-sm">
+            <button 
+              onClick={() => setFilterOpenNow(!filterOpenNow)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterOpenNow 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              Jetzt geöffnet
+            </button>
+            <button 
+              onClick={() => setFilterVending247(!filterVending247)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterVending247 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              24/7 Automaten
+            </button>
+            <button 
+              onClick={() => setFilterFavorites(!filterFavorites)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterFavorites 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              Favoriten
+            </button>
           </div>
         </motion.div>
         {renderMapPreview()}
@@ -1037,24 +1200,46 @@ export default function HofladenWebAppStartseite() {
         <div>
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-3xl font-bold text-green-950">In deiner Nähe</h2>
-            {searchQuery || selectedCategory !== 'all' || searchPlz ? (
+            {searchQuery || selectedCategory !== 'all' || searchPlz || filterOpenNow || filterVending247 || filterFavorites ? (
               <Button 
                 variant="ghost" 
                 className="rounded-full text-neutral-500" 
-                onClick={() => { setSearchInput(""); setSearchQuery(""); setSelectedCategory("all"); setPlzInput(""); setSearchPlz(""); setSearchRadius("10"); }}
+                onClick={() => { 
+                  setSearchInput(""); 
+                  setSearchQuery(""); 
+                  setSelectedCategory("all"); 
+                  setPlzInput(""); 
+                  setSearchPlz(""); 
+                  setSearchRadius("10"); 
+                  setFilterOpenNow(false); 
+                  setFilterVending247(false); 
+                  setFilterFavorites(false); 
+                }}
               >
                 Filter zurücksetzen
               </Button>
             ) : null}
           </div>
           <div className="space-y-6">
-            {places.length > 0 ? (
-              places.map((place) => renderPlaceCard(place))
+            {displayedPlaces.length > 0 ? (
+              displayedPlaces.map((place) => renderPlaceCard(place))
             ) : (
               <Card className="p-8 text-center bg-white rounded-2xl border-neutral-200">
                 <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-3" />
                 <div className="text-xl font-bold">Keine Hofläden gefunden</div>
-                {searchPlz ? (
+                {filterFavorites ? (
+                  <p className="text-neutral-500 mt-2">
+                    {user 
+                      ? "Du hast noch keine Favoriten gespeichert oder sie liegen außerhalb des Suchbereichs." 
+                      : "Du hast als Gast noch keine Favoriten gespeichert. Klicke auf das Herz-Symbol bei einem Hofladen, um ihn zu deinen Favoriten hinzuzufügen."}
+                  </p>
+                ) : filterOpenNow && filterVending247 ? (
+                  <p className="text-neutral-500 mt-2">Aktuell hat kein 24/7 Automat oder Hofladen geöffnet.</p>
+                ) : filterOpenNow ? (
+                  <p className="text-neutral-500 mt-2">Aktuell hat kein Hofladen in deiner Nähe geöffnet.</p>
+                ) : filterVending247 ? (
+                  <p className="text-neutral-500 mt-2">Es wurden keine 24/7 Automaten oder Milchstationen in deiner Nähe gefunden.</p>
+                ) : searchPlz ? (
                   <p className="text-neutral-500 mt-2">
                     In einem Umkreis von <strong>{searchRadius} km</strong> um die Postleitzahl <strong>{searchPlz}</strong> wurden keine Hofläden gefunden.<br/>
                     Bitte erhöhe den Suchradius (z. B. auf 25 km oder 50 km) oder suche in einem anderen Gebiet.
