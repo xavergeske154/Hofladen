@@ -520,6 +520,9 @@ export default function HofladenWebAppStartseite() {
       } else if (hash === "#/blog") {
         setView("blog");
         setViewParams({});
+      } else if (hash === "#/hoflaeden") {
+        setView("hoflaeden");
+        setViewParams({});
       } else if (hash === "#/events") {
         setView("events");
         setViewParams({});
@@ -939,6 +942,7 @@ export default function HofladenWebAppStartseite() {
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-6 font-semibold text-neutral-700 md:flex">
           <button onClick={() => navigateTo("home")} className={`hover:text-green-800 transition py-1 ${view === 'home' || view === 'farm-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Entdecken</button>
+          <button onClick={() => navigateTo("hoflaeden")} className={`hover:text-green-800 transition py-1 ${view === 'hoflaeden' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Hofläden</button>
           <button onClick={() => navigateTo("events")} className={`hover:text-green-800 transition py-1 ${view === 'events' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Events & Kalender</button>
           <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Blog</button>
           <button onClick={() => navigateTo("hofmarkt")} className={`hover:text-green-800 transition py-1 ${view === 'hofmarkt' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Hofmarkt</button>
@@ -1013,6 +1017,7 @@ export default function HofladenWebAppStartseite() {
             className="border-t border-neutral-200 bg-[#faf8f2] px-5 py-4 md:hidden flex flex-col gap-4 font-semibold text-neutral-700"
           >
             <button onClick={() => navigateTo("home")} className="text-left py-2 border-b border-neutral-100">Entdecken</button>
+            <button onClick={() => navigateTo("hoflaeden")} className="text-left py-2 border-b border-neutral-100">Hofläden</button>
             <button onClick={() => navigateTo("events")} className="text-left py-2 border-b border-neutral-100">Events & Kalender</button>
             <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Blog</button>
             <button onClick={() => navigateTo("hofmarkt")} className="text-left py-2 border-b border-neutral-100">Hofmarkt</button>
@@ -1342,7 +1347,19 @@ export default function HofladenWebAppStartseite() {
           </div>
           <div className="space-y-6">
             {displayedPlaces.length > 0 ? (
-              displayedPlaces.map((place) => renderPlaceCard(place))
+              <>
+                {displayedPlaces.slice(0, 4).map((place) => renderPlaceCard(place))}
+                {displayedPlaces.length > 4 && (
+                  <div className="text-center pt-4">
+                    <Button 
+                      className="rounded-full bg-green-800 px-8 py-5 text-white hover:bg-green-900 font-bold shadow-md cursor-pointer text-sm" 
+                      onClick={() => navigateTo("hoflaeden")}
+                    >
+                      Mehr anzeigen ({displayedPlaces.length - 4} weitere Hofläden)
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <Card className="p-8 text-center bg-white rounded-2xl border-neutral-200">
                 <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-3" />
@@ -1432,6 +1449,263 @@ export default function HofladenWebAppStartseite() {
                 <h3 className="text-xl font-bold text-green-950 mt-1">Unterstütze uns</h3>
                 <p className="mt-2 text-xs leading-relaxed text-neutral-600">
                   Hofladen-Finder is kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
+                </p>
+              </div>
+
+              {/* Four custom tiers in small list layout */}
+              <div className="space-y-2 pt-2">
+                {[
+                  { icon: "☕", title: "Kaffee ausgeben", price: "3 €" },
+                  { icon: "🥚", title: "Frühstück unterstützen", price: "5 €" },
+                  { icon: "🥔", title: "Regionalförderer", price: "10 €" },
+                  { icon: "🌻", title: "Projektförderer", price: "25 €" }
+                ].map(opt => (
+                  <button 
+                    key={opt.title}
+                    onClick={() => {
+                      alert(`Vielen Dank für deine Unterstützung über ${opt.price}! Weiterleitung zu PayPal...`);
+                    }}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl border border-neutral-100 hover:border-green-800/20 hover:bg-green-50/20 active:scale-[0.98] transition text-left cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2 text-xs font-semibold text-neutral-800">
+                      <span className="text-sm">{opt.icon}</span>
+                      {opt.title}
+                    </span>
+                    <span className="text-xs font-black text-green-900 bg-green-50 px-2 py-0.5 rounded-md border border-green-700/10">{opt.price}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Progress info */}
+              <div className="text-[10px] text-neutral-500 font-bold text-center border-t border-neutral-100 pt-3">
+                Bereits unterstützt von 127 Hofladen-Freunden (25.4% des Ziels)
+              </div>
+
+              <Button 
+                variant="outline"
+                className="w-full rounded-full text-xs font-bold py-5 mt-2 cursor-pointer" 
+                onClick={() => navigateTo("support")}
+              >
+                Mehr erfahren
+              </Button>
+            </CardContent>
+          </Card>
+        </aside>
+      </section>
+    </div>
+  );
+
+  // 1b. DEDICATED SEARCH PAGE FOR FARMS
+  const renderHoflaeden = () => (
+    <div className="space-y-8">
+      {/* Title section */}
+      <div>
+        <h1 className="text-4xl font-extrabold text-green-950 flex items-center gap-2">
+          <Store className="h-9 w-9 text-green-800" /> Hofläden & Direktvermarkter
+        </h1>
+        <p className="text-neutral-600 mt-2">Durchsuche alle registrierten Hofläden, Verkaufsstände, Milchstationen und Automaten.</p>
+      </div>
+
+      <section className="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+          {/* Search inputs */}
+          <div className="flex flex-col md:flex-row gap-3 max-w-2xl rounded-[1.75rem] bg-white p-2.5 shadow-sm ring-1 ring-neutral-200">
+            <div className="flex flex-1 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
+              <Search className="h-5 w-5 text-neutral-400 shrink-0" />
+              <input 
+                className="min-w-0 flex-1 bg-transparent py-2 outline-none text-sm text-neutral-800" 
+                placeholder="Suchbegriff (z.B. Maier, Milch)..." 
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
+              />
+            </div>
+            
+            <div className="flex w-full md:w-44 items-center gap-2 px-2 border-b md:border-b-0 md:border-r border-neutral-100 pb-2 md:pb-0">
+              <MapPin className="h-5 w-5 text-neutral-400 shrink-0" />
+              <input 
+                className="w-full bg-transparent py-2 outline-none text-sm text-neutral-800" 
+                placeholder="PLZ oder Ort..." 
+                value={plzInput}
+                onChange={(e) => setPlzInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
+              />
+            </div>
+            <div className="relative flex w-full md:w-44 items-center gap-1.5 px-2 min-h-[40px]">
+              <span className="text-xs text-neutral-400 uppercase font-bold shrink-0">Radius:</span>
+              <div className="flex items-center gap-1 text-sm font-semibold text-neutral-700 pointer-events-none select-none">
+                <span>{searchRadius === "DE" ? "DE" : `${searchRadius} km`}</span>
+                <ChevronDown className="h-4 w-4 text-neutral-500 shrink-0" />
+              </div>
+              <select 
+                value={searchRadius}
+                onChange={(e) => setSearchRadius(e.target.value)}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              >
+                <option value="2">2 km</option>
+                <option value="5">5 km</option>
+                <option value="10">10 km</option>
+                <option value="25">25 km</option>
+                <option value="50">50 km</option>
+                <option value="DE">Deutschland</option>
+              </select>
+            </div>
+
+            <Button 
+              className="rounded-full bg-green-800 px-6 py-5 text-sm font-bold hover:bg-green-900 shrink-0"
+              onClick={() => { setSearchQuery(searchInput); setSearchPlz(plzInput); }}
+            >
+              Suchen
+            </Button>
+          </div>
+          
+          <div className="mt-5 flex flex-wrap gap-3 text-sm">
+            <button 
+              onClick={() => setFilterOpenNow(!filterOpenNow)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterOpenNow 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              Jetzt geöffnet
+            </button>
+            <button 
+              onClick={() => setFilterVending247(!filterVending247)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterVending247 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              24/7 Automaten
+            </button>
+            <button 
+              onClick={() => setFilterFavorites(!filterFavorites)}
+              className={`rounded-full px-4 py-2 shadow-sm border transition-colors cursor-pointer ${
+                filterFavorites 
+                  ? "bg-green-800 text-white border-green-800 font-semibold" 
+                  : "bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50"
+              }`}
+            >
+              Favoriten
+            </button>
+          </div>
+        </motion.div>
+        {renderMapPreview()}
+      </section>
+
+      {/* Categories Bar */}
+      <section className="mt-6">
+        <div className="flex gap-4 overflow-x-auto pb-3">
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const isActive = selectedCategory === category.id;
+            return (
+              <button 
+                key={category.id} 
+                onClick={() => setSelectedCategory(category.id)} 
+                className={`min-w-[118px] rounded-[1.5rem] p-4 text-center shadow-sm transition cursor-pointer ${isActive ? "bg-green-100 text-green-900 border-2 border-green-800/20" : "bg-white text-neutral-700 hover:bg-neutral-50"}`}
+              >
+                <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70"><Icon className="h-7 w-7 text-green-800" /></div>
+                <div className="font-semibold">{category.label}</div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Main Grid: Listings + Side Banner */}
+      <section className="mt-4 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <div>
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-green-950">Ergebnisse ({displayedPlaces.length})</h2>
+            {searchQuery || selectedCategory !== 'all' || searchPlz || filterOpenNow || filterVending247 || filterFavorites ? (
+              <Button 
+                variant="ghost" 
+                className="rounded-full text-neutral-500" 
+                onClick={() => { 
+                  setSearchInput(""); 
+                  setSearchQuery(""); 
+                  setSelectedCategory("all"); 
+                  setPlzInput(""); 
+                  setSearchPlz(""); 
+                  setSearchRadius("10"); 
+                  setFilterOpenNow(false); 
+                  setFilterVending247(false); 
+                  setFilterFavorites(false); 
+                }}
+              >
+                Filter zurücksetzen
+              </Button>
+            ) : null}
+          </div>
+          <div className="space-y-6">
+            {displayedPlaces.length > 0 ? (
+              displayedPlaces.map((place) => renderPlaceCard(place))
+            ) : (
+              <Card className="p-8 text-center bg-white rounded-2xl border-neutral-200">
+                <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-3" />
+                <div className="text-xl font-bold">Keine Hofläden gefunden</div>
+                <p className="text-neutral-500 mt-2">Passe deine Filter an oder suche in einem anderen Gebiet.</p>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <aside className="space-y-4">
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Deine Merkliste</div>
+              <h3 className="text-2xl font-bold text-green-950">Favoriten & Leseliste</h3>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
+                Markiere Hofläden mit dem Herz-Symbol und speichere nützliche Blogartikel mit dem Lesezeichen ab. Sie werden automatisch in deinem Browser gesichert, damit du sie jederzeit wiederfindest.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("dashboard")}>
+                Meine Merkliste öffnen
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
+              <h3 className="text-2xl font-bold text-green-950">Hofladen hinzufügen</h3>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
+                Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
+                Jetzt Hofladen hinzufügen
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Community Zahlen Card */}
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Community</div>
+              <h3 className="text-2xl font-bold text-green-950">Statistik</h3>
+              <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
+                <div className="text-left">
+                  <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
+                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Hofläden</div>
+                </div>
+                <div className="text-left border-l border-neutral-100 pl-4">
+                  <div className="text-3xl font-extrabold text-green-900">1.284</div>
+                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Member</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden text-left">
+            <CardContent className="p-6 space-y-4">
+              <div>
+                <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Spenden & Erhalt</div>
+                <h3 className="text-xl font-bold text-green-950 mt-1">Unterstütze uns</h3>
+                <p className="mt-2 text-xs leading-relaxed text-neutral-600">
+                  Hofladen-Finder ist kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
                 </p>
               </div>
 
@@ -3251,6 +3525,7 @@ export default function HofladenWebAppStartseite() {
         <main className="mx-auto max-w-7xl px-5 pb-28 pt-8">
           <AnimatePresence mode="wait">
             {view === 'home' && renderHome()}
+            {view === 'hoflaeden' && renderHoflaeden()}
             {view === 'farm-detail' && renderFarmDetail()}
             {view === 'blog' && renderBlogList()}
             {view === 'blog-detail' && renderBlogDetail()}
@@ -3283,7 +3558,7 @@ export default function HofladenWebAppStartseite() {
 
           <button 
             className="-mt-8 flex flex-col items-center gap-1 text-green-800"
-            onClick={() => navigateTo("home")}
+            onClick={() => navigateTo("hoflaeden")}
           >
             <span className="flex h-16 w-16 items-center justify-center rounded-full bg-green-800 text-white shadow-lg"><Map className="h-8 w-8" /></span>Karte
           </button>
@@ -3310,6 +3585,7 @@ export default function HofladenWebAppStartseite() {
           <div>© 2026 Hofladen-Finder. Alle Rechte vorbehalten.</div>
           <div className="flex gap-4">
             <button onClick={() => navigateTo("home")} className="hover:underline">Entdecken</button>
+            <button onClick={() => navigateTo("hoflaeden")} className="hover:underline">Hofläden</button>
             <button onClick={() => navigateTo("events")} className="hover:underline">Events</button>
             <button onClick={() => navigateTo("blog")} className="hover:underline">Blog</button>
             <button onClick={() => navigateTo("hofmarkt")} className="hover:underline">Hofmarkt</button>
