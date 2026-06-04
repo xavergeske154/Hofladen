@@ -1126,19 +1126,23 @@ export default function HofladenWebAppStartseite() {
                 onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
               />
             </div>
-            <div className="flex w-full md:w-44 items-center gap-1.5 px-2">
+            <div className="relative flex w-full md:w-44 items-center gap-1.5 px-2 min-h-[40px]">
               <span className="text-xs text-neutral-400 uppercase font-bold shrink-0">Radius:</span>
+              <div className="flex items-center gap-1 text-sm font-semibold text-neutral-700 pointer-events-none select-none">
+                <span>{searchRadius === "DE" ? "DE" : `${searchRadius} km`}</span>
+                <ChevronDown className="h-4 w-4 text-neutral-500 shrink-0" />
+              </div>
               <select 
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(e.target.value)}
-                className="bg-transparent outline-none text-sm font-semibold text-neutral-700 w-full py-2 pr-6 cursor-pointer"
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
               >
                 <option value="2">2 km</option>
                 <option value="5">5 km</option>
                 <option value="10">10 km</option>
                 <option value="25">25 km</option>
                 <option value="50">50 km</option>
-                <option value="DE">Ganz DE</option>
+                <option value="DE">Deutschland</option>
               </select>
             </div>
 
@@ -1252,8 +1256,16 @@ export default function HofladenWebAppStartseite() {
                   <p className="text-neutral-500 mt-2">Es wurden keine 24/7 Automaten oder Milchstationen in deiner Nähe gefunden.</p>
                 ) : searchPlz ? (
                   <p className="text-neutral-500 mt-2">
-                    In einem Umkreis von <strong>{searchRadius} km</strong> um die Postleitzahl <strong>{searchPlz}</strong> wurden keine Hofläden gefunden.<br/>
-                    Bitte erhöhe den Suchradius (z. B. auf 25 km oder 50 km) oder suche in einem anderen Gebiet.
+                    {searchRadius === "DE" ? (
+                      <>In ganz <strong>Deutschland</strong> wurden keine Hofläden gefunden.<br/></>
+                    ) : (
+                      <>In einem Umkreis von <strong>{searchRadius} km</strong> um die Postleitzahl <strong>{searchPlz}</strong> wurden keine Hofläden gefunden.<br/></>
+                    )}
+                    {searchRadius === "DE" ? (
+                      "Bitte passe deine Filteroptionen oder deinen Suchbegriff an."
+                    ) : (
+                      "Bitte erhöhe den Suchradius (z. B. auf 25 km oder 50 km) oder suche in einem anderen Gebiet."
+                    )}
                   </p>
                 ) : (
                   <p className="text-neutral-500 mt-2">Versuche es mit einem anderen Suchbegriff oder passe die Kategorie an.</p>
