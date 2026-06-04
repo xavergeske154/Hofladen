@@ -209,6 +209,7 @@ export const api = {
     const params = new URLSearchParams();
     if (filters.farmShopId) params.append('farmShopId', filters.farmShopId);
     if (filters.category) params.append('category', filters.category);
+    if (filters.plz) params.append('plz', filters.plz);
     const res = await fetch(`/api/events?${params.toString()}`, {
       headers: getHeaders(),
     });

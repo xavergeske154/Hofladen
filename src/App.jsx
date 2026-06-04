@@ -396,6 +396,9 @@ export default function HofladenWebAppStartseite() {
   const [events, setEvents] = useState([]);
   const [selectedEventCategory, setSelectedEventCategory] = useState("all");
   const [eventTab, setEventTab] = useState("all"); // all, wochenmarkt, hoffest
+  const [eventPlzQuery, setEventPlzQuery] = useState("");
+  const [appliedEventPlz, setAppliedEventPlz] = useState("");
+  const [eventPage, setEventPage] = useState(1);
 
   // Dropdown & Banner UI State
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -537,14 +540,14 @@ export default function HofladenWebAppStartseite() {
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const list = await api.getEvents({ category: selectedEventCategory });
+        const list = await api.getEvents({ category: selectedEventCategory, plz: appliedEventPlz });
         setEvents(list);
       } catch (err) {
         console.error("Failed to load events", err);
       }
     };
     loadEvents();
-  }, [selectedEventCategory]);
+  }, [selectedEventCategory, appliedEventPlz]);
 
   // Sync Vendor details when profile is fetched/active
   useEffect(() => {
@@ -777,7 +780,7 @@ export default function HofladenWebAppStartseite() {
       });
       setVendorEventSuccess("Veranstaltung erfolgreich erstellt!");
       setNewEventForm({ title: "", date: "", time: "", description: "", location: "", category: "hoffest" });
-      const list = await api.getEvents({ category: selectedEventCategory });
+      const list = await api.getEvents({ category: selectedEventCategory, plz: appliedEventPlz });
       setEvents(list);
     } catch (err) {
       console.error(err);
@@ -787,7 +790,7 @@ export default function HofladenWebAppStartseite() {
   const handleDeleteEvent = async (eventId) => {
     try {
       await api.deleteEvent(eventId);
-      const list = await api.getEvents({ category: selectedEventCategory });
+      const list = await api.getEvents({ category: selectedEventCategory, plz: appliedEventPlz });
       setEvents(list);
     } catch (err) {
       console.error(err);
@@ -1636,6 +1639,29 @@ export default function HofladenWebAppStartseite() {
     );
   };
 
+  const handleSearchEvents = async () => {
+    setAppliedEventPlz(eventPlzQuery);
+    setEventPage(1);
+    try {
+      const list = await api.getEvents({ category: selectedEventCategory, plz: eventPlzQuery });
+      setEvents(list);
+    } catch (err) {
+      console.error("Failed to load events", err);
+    }
+  };
+
+  const handleResetEventsPlz = async () => {
+    setEventPlzQuery("");
+    setAppliedEventPlz("");
+    setEventPage(1);
+    try {
+      const list = await api.getEvents({ category: selectedEventCategory, plz: "" });
+      setEvents(list);
+    } catch (err) {
+      console.error("Failed to load events", err);
+    }
+  };
+
   // Events & Calendar Page
   const renderEvents = () => {
     const filteredEvents = events.filter(e => {
@@ -1644,13 +1670,46 @@ export default function HofladenWebAppStartseite() {
       return true;
     });
 
+    // Pagination Slicing (10 items per page)
+    const eventPageSize = 10;
+    const startIndex = (eventPage - 1) * eventPageSize;
+    const paginatedEvents = filteredEvents.slice(startIndex, startIndex + eventPageSize);
+
     return (
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-green-950 flex items-center justify-center gap-2">
-            <Calendar className="h-9 w-9 text-green-800" /> Events & Regionaler Kalender
-          </h1>
-          <p className="text-neutral-600 mt-2 max-w-md mx-auto">Verpasse keine Hoffeste, Wochenmärkte und regionalen Aktionen in deiner Nähe.</p>
+        <div className="text-center space-y-4">
+          <div>
+            <h1 className="text-4xl font-extrabold text-green-950 flex items-center justify-center gap-2">
+              <Calendar className="h-9 w-9 text-green-800" /> Events & Regionaler Kalender
+            </h1>
+            <p className="text-neutral-600 mt-2 max-w-md mx-auto">Verpasse keine Hoffeste, Wochenmärkte und regionalen Aktionen in deiner Nähe.</p>
+          </div>
+
+          {/* Postcode Search bar */}
+          <div className="max-w-md mx-auto rounded-full bg-white p-1.5 shadow-sm ring-1 ring-neutral-200 flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-neutral-400 shrink-0 ml-3" />
+            <input 
+              className="w-full bg-transparent py-2 outline-none text-sm text-neutral-800" 
+              placeholder="PLZ oder Ort für Region eingeben..." 
+              value={eventPlzQuery}
+              onChange={(e) => setEventPlzQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSearchEvents(); }}
+            />
+            {eventPlzQuery && (
+              <button 
+                onClick={handleResetEventsPlz}
+                className="text-neutral-400 hover:text-neutral-600 p-1 cursor-pointer shrink-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+            <Button 
+              className="rounded-full bg-green-800 hover:bg-green-900 text-xs py-2 px-5 font-bold shrink-0 cursor-pointer"
+              onClick={handleSearchEvents}
+            >
+              Suchen
+            </Button>
+          </div>
         </div>
 
         {/* Tab filters */}
@@ -1662,8 +1721,8 @@ export default function HofladenWebAppStartseite() {
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setEventTab(tab.id)}
-              className={`py-2.5 px-4 font-bold text-sm border-b-2 transition ${
+              onClick={() => { setEventTab(tab.id); setEventPage(1); }}
+              className={`py-2.5 px-4 font-bold text-sm border-b-2 transition cursor-pointer ${
                 eventTab === tab.id 
                   ? 'border-green-800 text-green-900' 
                   : 'border-transparent text-neutral-500 hover:text-neutral-700'
@@ -1676,15 +1735,15 @@ export default function HofladenWebAppStartseite() {
 
         {/* Calendar Grid */}
         <div className="grid gap-6">
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map(event => (
+          {paginatedEvents.length > 0 ? (
+            paginatedEvents.map(event => (
               <Card key={event.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col md:flex-row hover:shadow-md transition">
                 <div className="h-48 md:h-auto md:w-80 shrink-0 overflow-hidden">
                   <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                         event.farmShopId ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
                       }`}>
@@ -1693,6 +1752,11 @@ export default function HofladenWebAppStartseite() {
                       <span className="text-xs text-neutral-500 font-semibold flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5" /> {event.time}
                       </span>
+                      {event.distance && (
+                        <span className="text-xs bg-green-100 text-green-900 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                          <Navigation className="h-3 w-3" /> {event.distance}
+                        </span>
+                      )}
                     </div>
 
                     <h2 className="text-2xl font-bold text-neutral-900 mt-2">{event.title}</h2>
@@ -1712,14 +1776,14 @@ export default function HofladenWebAppStartseite() {
                       {event.farmShopId && (
                         <Button 
                           variant="outline" 
-                          className="rounded-full text-xs"
+                          className="rounded-full text-xs cursor-pointer"
                           onClick={() => navigateTo("farm-detail", { id: event.farmShopId })}
                         >
                           Hofladen ansehen
                         </Button>
                       )}
                       <Button 
-                        className="rounded-full bg-green-800 hover:bg-green-900 text-xs px-4"
+                        className="rounded-full bg-green-800 hover:bg-green-900 text-xs px-4 cursor-pointer"
                         onClick={() => navigateToMap(event.location)}
                       >
                         Auf Karte anzeigen
@@ -1737,6 +1801,31 @@ export default function HofladenWebAppStartseite() {
             </Card>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {filteredEvents.length > eventPageSize && (
+          <div className="flex items-center justify-center gap-4 mt-8 pt-4 border-t border-neutral-100">
+            <Button
+              variant="outline"
+              disabled={eventPage === 1}
+              onClick={() => { setEventPage(prev => Math.max(1, prev - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="rounded-full cursor-pointer"
+            >
+              Zurück
+            </Button>
+            <span className="text-sm font-semibold text-neutral-600">
+              Seite {eventPage} von {Math.ceil(filteredEvents.length / eventPageSize)}
+            </span>
+            <Button
+              variant="outline"
+              disabled={eventPage >= Math.ceil(filteredEvents.length / eventPageSize)}
+              onClick={() => { setEventPage(prev => prev + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="rounded-full cursor-pointer"
+            >
+              Weiter
+            </Button>
+          </div>
+        )}
       </div>
     );
   };

@@ -667,7 +667,7 @@ app.delete('/api/admin/blogs/:id', authenticateToken, authorizeRole(['admin']), 
 
 app.get('/api/events', (req, res) => {
   const db = Database.read();
-  const { farmShopId, category } = req.query;
+  const { farmShopId, category, plz } = req.query;
   let list = db.events || [];
 
   if (farmShopId) {
@@ -676,6 +676,86 @@ app.get('/api/events', (req, res) => {
   if (category && category !== 'all') {
     list = list.filter(e => e.category === category);
   }
+
+  // Filter / Sort by PLZ if provided
+  if (plz) {
+    const query = plz.trim();
+    let plzEntry = null;
+
+    // Check if numeric (postcode)
+    if (/^\d+$/.test(query)) {
+      const cleanPlz = query.padStart(5, '0');
+      plzEntry = plzDatabase[cleanPlz];
+    } else {
+      // Search by city/municipality name in plzDatabase
+      const queryLower = query.toLowerCase();
+      const keys = Object.keys(plzDatabase);
+      
+      // Try exact city/district match
+      let foundKey = keys.find(k => {
+        const entry = plzDatabase[k];
+        return (entry.city && entry.city.toLowerCase() === queryLower) ||
+               (entry.district && entry.district.toLowerCase() === queryLower);
+      });
+      
+      // Try partial match
+      if (!foundKey) {
+        foundKey = keys.find(k => {
+          const entry = plzDatabase[k];
+          return (entry.city && entry.city.toLowerCase().includes(queryLower)) ||
+                 (entry.district && entry.district.toLowerCase().includes(queryLower));
+        });
+      }
+      
+      if (foundKey) {
+        plzEntry = plzDatabase[foundKey];
+      }
+    }
+
+    if (plzEntry && plzEntry.lat && plzEntry.lng) {
+      list = list.map(event => {
+        let distanceNum = 999.0;
+        let eventLat = null;
+        let eventLng = null;
+
+        // Try getting coordinates from associated farm shop first
+        if (event.farmShopId) {
+          const shop = db.farm_shops.find(f => f.id === event.farmShopId);
+          if (shop && shop.lat && shop.lng) {
+            eventLat = shop.lat;
+            eventLng = shop.lng;
+          }
+        }
+
+        // If no farm shop or no coordinates, extract postcode from location string
+        if (!eventLat || !eventLng) {
+          const plzMatch = event.location.match(/\b\d{5}\b/);
+          if (plzMatch) {
+            const eventPlz = plzMatch[0];
+            const eventPlzEntry = plzDatabase[eventPlz];
+            if (eventPlzEntry && eventPlzEntry.lat && eventPlzEntry.lng) {
+              eventLat = eventPlzEntry.lat;
+              eventLng = eventPlzEntry.lng;
+            }
+          }
+        }
+
+        if (eventLat && eventLng) {
+          distanceNum = calculateDistance(plzEntry.lat, plzEntry.lng, eventLat, eventLng);
+        }
+
+        return {
+          ...event,
+          distanceNum,
+          distance: distanceNum < 999.0 ? `${distanceNum.toFixed(1)} km` : null
+        };
+      });
+
+      // Sort by distance ascending
+      list.sort((a, b) => a.distanceNum - b.distanceNum);
+    }
+  }
+
   res.json(list);
 });
 
