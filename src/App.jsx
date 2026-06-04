@@ -104,23 +104,23 @@ export default function HofladenWebAppStartseite() {
 
   useEffect(() => {
     if (searchPlz) {
-      const cleanPlz = searchPlz.trim();
-      const lookup = {
-        '85560': [48.0779, 11.9715],
-        '85604': [48.0827, 11.8267],
-        '85567': [48.0478, 11.9664],
-        '53909': [50.6904, 6.6508],
-      };
-      if (lookup[cleanPlz]) {
-        setPlzCoordinates(lookup[cleanPlz]);
-      } else {
-        // Fallback: deterministic offset in Bavaria if it is some other PLZ
-        let sum = 0;
-        for (let i = 0; i < cleanPlz.length; i++) sum += cleanPlz.charCodeAt(i);
-        const latOffset = ((sum % 100) / 1000) - 0.05;
-        const lngOffset = (((sum >> 8) % 100) / 1000) - 0.05;
-        setPlzCoordinates([48.1371 + latOffset, 11.5754 + lngOffset]);
-      }
+      const cleanPlz = searchPlz.trim().padStart(5, '0');
+      fetch(`/api/plz/${cleanPlz}`)
+        .then(res => {
+          if (!res.ok) throw new Error("PLZ nicht gefunden");
+          return res.json();
+        })
+        .then(data => {
+          if (data.lat && data.lng) {
+            setPlzCoordinates([data.lat, data.lng]);
+          } else {
+            setPlzCoordinates(null);
+          }
+        })
+        .catch(err => {
+          console.error("Geocoding failed for PLZ", cleanPlz, err);
+          setPlzCoordinates(null);
+        });
     } else {
       setPlzCoordinates(null);
     }
@@ -1015,7 +1015,14 @@ export default function HofladenWebAppStartseite() {
               <Card className="p-8 text-center bg-white rounded-2xl border-neutral-200">
                 <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-3" />
                 <div className="text-xl font-bold">Keine Hofläden gefunden</div>
-                <p className="text-neutral-500 mt-2">Versuche es mit einem anderen Suchbegriff oder passe die Kategorie an.</p>
+                {searchPlz ? (
+                  <p className="text-neutral-500 mt-2">
+                    In einem Umkreis von <strong>{searchRadius} km</strong> um die Postleitzahl <strong>{searchPlz}</strong> wurden keine Hofläden gefunden.<br/>
+                    Bitte erhöhe den Suchradius (z. B. auf 25 km oder 50 km) oder suche in einem anderen Gebiet.
+                  </p>
+                ) : (
+                  <p className="text-neutral-500 mt-2">Versuche es mit einem anderen Suchbegriff oder passe die Kategorie an.</p>
+                )}
               </Card>
             )}
           </div>

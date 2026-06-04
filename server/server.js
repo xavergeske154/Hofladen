@@ -2,6 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { Database } from './database.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PLZ_DATA_FILE = path.resolve(__dirname, './plz.json');
+
+let plzDatabase = {};
+try {
+  if (fs.existsSync(PLZ_DATA_FILE)) {
+    plzDatabase = JSON.parse(fs.readFileSync(PLZ_DATA_FILE, 'utf-8'));
+    console.log(`Loaded ${Object.keys(plzDatabase).length} PLZ coordinates.`);
+  } else {
+    console.warn(`PLZ database file not found at ${PLZ_DATA_FILE}`);
+  }
+} catch (err) {
+  console.error('Failed to load PLZ database:', err);
+}
 
 const app = express();
 const PORT = 5001;
@@ -14,9 +33,24 @@ app.use(express.json());
 // Password Hashing Helper
 const hashPassword = (password) => Buffer.from(password).toString('base64');
 
-// Mock Geocoding Helper to resolve Lat/Lng from address/postcode
+// Geocoding Helper to resolve Lat/Lng from address/postcode
 const geocodeAddress = (address) => {
   if (!address) return { lat: 48.0779, lng: 11.9715 };
+  
+  // Extract 5-digit postcode
+  const plzMatch = address.match(/\b\d{5}\b/);
+  if (plzMatch) {
+    const plzStr = plzMatch[0];
+    const plzEntry = plzDatabase[plzStr];
+    if (plzEntry && plzEntry.lat && plzEntry.lng) {
+      // Add a tiny random offset so markers at the exact same postcode don't overlap completely
+      return { 
+        lat: plzEntry.lat + (Math.random() - 0.5) * 0.005, 
+        lng: plzEntry.lng + (Math.random() - 0.5) * 0.005 
+      };
+    }
+  }
+
   const cleanAddr = address.toLowerCase();
   
   if (cleanAddr.includes("ebersberg") || cleanAddr.includes("85560")) {
@@ -197,6 +231,19 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
    PUBLIC FINDER & DETAILS ENDPOINTS
    ========================================================================== */
 
+// Haversine Formula for distance in km
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+};
+
 app.get('/api/farm-shops', (req, res) => {
   const db = Database.read();
   
@@ -219,40 +266,63 @@ app.get('/api/farm-shops', (req, res) => {
     publicShops = publicShops.filter(f => f.category === category);
   }
 
-  // Simulated Radius / PLZ Search filter
+  // Real Distance / PLZ Search filter using Haversine formula
   if (plz) {
+    const cleanPlz = plz.trim().padStart(5, '0');
+    const plzEntry = plzDatabase[cleanPlz];
     const rKm = parseInt(radius) || 10;
-    const distanceMatrix = {
-      '85560': { 1: 1.2, 2: 6.5, 3: 9.8, 4: 450 },
-      '85604': { 1: 7.2, 2: 0.8, 3: 8.1, 4: 460 },
-      '85567': { 1: 9.2, 2: 7.9, 3: 1.5, 4: 455 },
-      '53909': { 1: 450, 2: 460, 3: 455, 4: 0.5 }
-    };
-
-    const targetDistances = distanceMatrix[plz.trim()];
-
-    publicShops = publicShops.map(shop => {
-      let distanceNum = 12.5; // default simulated distance
-      if (targetDistances && targetDistances[shop.id] !== undefined) {
-        distanceNum = targetDistances[shop.id];
-      } else {
-        // Deterministic fallback based on shop name/id and PLZ
-        let sum = 0;
-        for (let i = 0; i < plz.length; i++) sum += plz.charCodeAt(i);
-        distanceNum = ((sum * shop.id) % 45) + 2.5; 
-      }
-      return {
-        ...shop,
-        distanceNum,
-        distance: `${distanceNum.toFixed(1)} km`
-      };
-    });
-
-    // Filter by radius limit
-    publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+    
+    if (plzEntry && plzEntry.lat && plzEntry.lng) {
+      publicShops = publicShops.map(shop => {
+        let distanceNum = 999.0;
+        if (shop.lat && shop.lng) {
+          distanceNum = calculateDistance(plzEntry.lat, plzEntry.lng, shop.lat, shop.lng);
+        }
+        return {
+          ...shop,
+          distanceNum,
+          distance: `${distanceNum.toFixed(1)} km`
+        };
+      });
+      // Filter by radius limit
+      publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+    } else {
+      // Fallback if postcode coordinates are not found in DB
+      publicShops = publicShops.map(shop => {
+        let distanceNum = 999.0;
+        if (shop.lat && shop.lng) {
+          distanceNum = calculateDistance(48.0779, 11.9715, shop.lat, shop.lng);
+        }
+        return {
+          ...shop,
+          distanceNum,
+          distance: `${distanceNum.toFixed(1)} km`
+        };
+      });
+      // Filter by radius limit
+      publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
+    }
   }
 
   res.json(publicShops);
+});
+
+// Endpoint for geocoding / looking up coordinates of any German postcode
+app.get('/api/plz/:plz', (req, res) => {
+  const plzParam = req.params.plz.trim().padStart(5, '0');
+  const plzEntry = plzDatabase[plzParam];
+  if (plzEntry) {
+    res.json({
+      plz: plzParam,
+      lat: plzEntry.lat,
+      lng: plzEntry.lng,
+      state: plzEntry.state,
+      district: plzEntry.district,
+      type: plzEntry.type
+    });
+  } else {
+    res.status(404).json({ error: 'Postleitzahl nicht gefunden' });
+  }
 });
 
 app.get('/api/farm-shops/:id', (req, res) => {
