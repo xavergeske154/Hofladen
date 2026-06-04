@@ -1381,13 +1381,39 @@ export default function HofladenWebAppStartseite() {
         </div>
 
         <aside id="anbieter" className="space-y-4">
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Deine Merkliste</div>
+              <h3 className="text-2xl font-bold text-green-950">Favoriten & Leseliste</h3>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
+                Markiere Hofläden mit dem Herz-Symbol und speichere nützliche Blogartikel mit dem Lesezeichen ab. Sie werden automatisch in deinem Browser gesichert, damit du sie jederzeit wiederfindest.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("dashboard")}>
+                Meine Merkliste öffnen
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
+              <h3 className="text-2xl font-bold text-green-950">Hofladen hinzufügen</h3>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
+                Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
+                Jetzt Hofladen hinzufügen
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden">
             <CardContent className="p-6 space-y-4">
               <div>
                 <div className="text-xs font-bold text-green-800 uppercase tracking-wider">Spenden & Erhalt</div>
                 <h3 className="text-xl font-bold text-green-950 mt-1">Unterstütze uns</h3>
                 <p className="mt-2 text-xs leading-relaxed text-neutral-600">
-                  Hofladen-Finder ist kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
+                  Hofladen-Finder is kostenlos und werbefrei. Hilf uns mit einem kleinen Beitrag bei Serverkosten und Weiterentwicklung.
                 </p>
               </div>
 
@@ -1426,32 +1452,6 @@ export default function HofladenWebAppStartseite() {
                 onClick={() => navigateTo("support")}
               >
                 Mehr erfahren
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-850">Deine Merkliste</div>
-              <h3 className="text-2xl font-bold text-green-950">Favoriten & Leseliste</h3>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
-                Markiere Hofläden mit dem Herz-Symbol und speichere nützliche Blogartikel mit dem Lesezeichen ab. Sie werden automatisch in deinem Browser gesichert, damit du sie jederzeit wiederfindest.
-              </p>
-              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("dashboard")}>
-                Meine Merkliste öffnen
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
-            <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
-              <h3 className="text-2xl font-bold text-green-950">Hofladen hinzufügen</h3>
-              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
-                Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
-              </p>
-              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
-                Jetzt Hofladen hinzufügen
               </Button>
             </CardContent>
           </Card>
@@ -2480,6 +2480,20 @@ export default function HofladenWebAppStartseite() {
           </CardContent>
         </Card>
 
+        {/* Hofladen hinzufügen Card */}
+        <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm text-left">
+          <CardContent className="p-6">
+            <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
+            <h3 className="text-xl font-bold text-green-950">Hofladen hinzufügen</h3>
+            <p className="mt-4 text-xs leading-relaxed text-neutral-700">
+              Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
+            </p>
+            <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
+              Jetzt Hofladen hinzufügen
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Mini Sponsorship Card */}
         <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden text-left">
           <CardContent className="p-6 space-y-4">
@@ -2526,20 +2540,6 @@ export default function HofladenWebAppStartseite() {
               onClick={() => navigateTo("support")}
             >
               Mehr erfahren
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Hofladen hinzufügen Card */}
-        <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm text-left">
-          <CardContent className="p-6">
-            <div className="mb-3 text-sm font-semibold text-green-850">Kostenloser Eintrag</div>
-            <h3 className="text-xl font-bold text-green-950">Hofladen hinzufügen</h3>
-            <p className="mt-4 text-xs leading-relaxed text-neutral-700">
-              Du besitzt einen Hofladen, Verkaufsstand, eine Milchstation oder einen Automaten? Trage deine Verkaufsstelle kostenlos ein und werde für tausende Kunden sichtbar.
-            </p>
-            <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
-              Jetzt Hofladen hinzufügen
             </Button>
           </CardContent>
         </Card>
