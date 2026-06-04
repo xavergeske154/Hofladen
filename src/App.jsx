@@ -869,8 +869,7 @@ export default function HofladenWebAppStartseite() {
 
   // Maps Redirect
   const navigateToMap = (address) => {
-    const query = encodeURIComponent(address);
-    window.open(`https://maps.google.com/?q=${query}`, '_blank');
+    handleOpenMapRoute(address);
   };
 
   // Render Helpers
