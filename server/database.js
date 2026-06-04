@@ -84,8 +84,8 @@ const DEFAULT_DATA = {
   blog_posts: [
     {
       id: "b-1",
-      title: "Wie entsteht Honig?",
-      slug: "wie-entsteht-honig",
+      title: "Honig-Herstellung",
+      slug: "honig-herstellung",
       teaser: "Fleißige Bienen, bunte Blüten und viel Geduld – so entsteht das flüssige Gold unserer heimischen Imker.",
       image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=900&q=80",
       category: "Imkerei",
@@ -128,8 +128,8 @@ Da Rohmilch jedoch nicht erhitzt wurde, kann sie natürliche Keime enthalten. F�
     },
     {
       id: "b-4",
-      title: "DIY: Hochbeete einfach selbst bauen",
-      slug: "diy-hochbeete-bauen",
+      title: "Hochbeet selber bauen",
+      slug: "hochbeet-selber-bauen",
       teaser: "Ein eigenes Hochbeet bauen schont den Rücken, hält Schädlinge fern und steigert den Ertrag. So gelingt das Holz-Projekt.",
       image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&q=80",
       category: "DIY",
@@ -158,25 +158,24 @@ Durch das Verrotten der unteren Schichten entsteht Wärme, die das Wachstum besc
     },
     {
       id: "b-5",
-      title: "Der ultimative Guide für saftige Tomaten",
-      slug: "guide-tomaten-zuechten",
-      teaser: "Tomaten gehören zu den beliebtesten Gartenpflanzen. Mit diesen Expertentipps gelingt der Anbau auf Balkon und Beet.",
-      image: "https://images.unsplash.com/photo-1592841208221-a5808df73658?auto=format&fit=crop&w=900&q=80",
+      title: "Die Kraft der Kamille",
+      slug: "die-kraft-der-kamille",
+      teaser: "Die echte Kamille ist ein Wundermittel der Natur. Erfahre alles über Wirkung, Ernte und Anwendung bei uns.",
+      image: "https://images.unsplash.com/photo-1600181519808-16147498dbf5?auto=format&fit=crop&w=900&q=80",
       category: "Ratgeber",
       publishDate: "2026-06-02",
-      content: `Tomaten züchten ist keine Wissenschaft, benötigt jedoch etwas Aufmerksamkeit. Damit Ihre Pflanzen reichlich süße Früchte tragen, beachten Sie folgende Grundregeln:
+      content: `Die echte Kamille (Matricaria chamomilla) gehört zu den ältesten und beliebtesten Heilpflanzen Europas. Ihre Anwendungsbereiche sind extrem vielfältig – ob als Tee, Dampfbad, Tinktur oder Umschlag.
 
-1. Der richtige Standort:
-Tomaten lieben es heiß und sonnig. Ein Regenschutz ist absolut essenziell, da nasse Blätter sehr anfällig für die gefürchtete Kraut- und Braunfäule sind. Gießen Sie daher immer nur direkt an den Wurzelbereich und niemals über das Laub.
+1. Die Heilwirkung:
+Die Blüten der Kamille enthalten ätherische Öle (wie Bisabolol und Chamazulen) sowie Flavonoide. Diese Wirkstoffe wirken entzündungshemmend, krampflösend, antibakteriell und beruhigend auf Magen und Darm sowie auf die Haut.
 
-2. Richtig Ausgeizen:
-Bei Stabtomaten sollten Sie die sogenannten "Geiztriebe" regelmäßig entfernen. Das sind die kleinen Seitentriebe, die in den Blattachseln zwischen dem Haupttrieb und den Fruchtständen wachsen. Sie rauben der Pflanze unnötig Energie, die sonst in die Reifung der Früchte fließt.
+2. Kamille im eigenen Garten ernten:
+Kamille wächst hervorragend an sonnigen Standorten auf nährstoffreichen, durchlässigen Böden. Geerntet werden die Blütenköpfe an einem trockenen Vormittag, sobald sie voll erblüht sind. Breiten Sie die Blüten zum Trocknen an einem schattigen, luftigen Ort aus.
 
-3. Nährstoffhunger stillen:
-Tomaten sind Starkzehrer. Arbeiten Sie beim Pflanzen reichlich Kompost, Hornspäne oder Pferdemist in die Erde ein. Während der Wachstums- und Fruchtphase sollten Sie alle zwei Wochen mit einem biologischen Tomatendünger oder verdünnter Brennnesseljauche nachdüngen.
-
-4. Ausreichend Wasser:
-Gießen Sie Tomaten gleichmäßig. Unregelmäßiges Gießen führt dazu, dass die Früchte bei plötzlichen Wasserschüben aufplatzen. Mulchen Sie den Boden mit Stroh oder Rasenschnitt, um die Feuchtigkeit im Boden zu halten.`
+3. Einfache Anwendungen:
+- Kamillentee: 2 TL getrocknete Blüten mit 250ml kochendem Wasser übergießen, 10 Minuten abgedeckt ziehen lassen. Hilft bei Magen-Darm-Beschwerden oder zum Gurgeln bei Entzündungen im Mundraum.
+- Inhalation bei Erkältung: Eine Handvoll Blüten in eine Schüssel mit heißem Wasser geben, den Kopf mit einem Handtuch abdecken und 10 Minuten den heilsamen Dampf einatmen.
+- Umschläge: Abgekühlter Kamillensud lindert Hautreizungen und kleine Entzündungen.`
     }
   ],
   events: [

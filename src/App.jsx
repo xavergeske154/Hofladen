@@ -1016,16 +1016,41 @@ export default function HofladenWebAppStartseite() {
   // 3. BLOG LIST PAGE
   const renderBlogList = () => {
     const [selectedBlogCat, setSelectedBlogCat] = useState("all");
+    const [blogSearch, setBlogSearch] = useState("");
 
-    const filteredBlogs = selectedBlogCat === "all"
-      ? blogs
-      : blogs.filter(b => b.category.toLowerCase() === selectedBlogCat.toLowerCase());
+    const filteredBlogs = blogs.filter(b => {
+      const matchesCategory = selectedBlogCat === "all" || b.category.toLowerCase() === selectedBlogCat.toLowerCase();
+      const matchesSearch = b.title.toLowerCase().includes(blogSearch.toLowerCase()) || 
+                            b.teaser.toLowerCase().includes(blogSearch.toLowerCase()) ||
+                            b.content.toLowerCase().includes(blogSearch.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
 
     return (
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-green-950">Blog</h1>
           <p className="text-neutral-600 mt-2 max-w-md mx-auto">Hilfreiche DIY-Projekte, Garten-Guides und Wissenswertes über Natur & Imkerei.</p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto relative rounded-full bg-white shadow-sm ring-1 ring-neutral-200 focus-within:ring-2 focus-within:ring-green-800/20 focus-within:border-green-800 transition p-1 flex items-center gap-2">
+          <Search className="h-5 w-5 text-neutral-400 ml-3 shrink-0" />
+          <input
+            type="text"
+            className="w-full bg-transparent py-2.5 pr-4 outline-none text-sm text-neutral-800 placeholder-neutral-400"
+            placeholder="Artikel nach Stichworten durchsuchen..."
+            value={blogSearch}
+            onChange={(e) => setBlogSearch(e.target.value)}
+          />
+          {blogSearch && (
+            <button 
+              onClick={() => setBlogSearch("")} 
+              className="text-neutral-400 hover:text-neutral-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-neutral-100 transition mr-1"
+            >
+              Löschen
+            </button>
+          )}
         </div>
 
         {/* Blog Categories tabs */}
@@ -1051,44 +1076,50 @@ export default function HofladenWebAppStartseite() {
           ))}
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          {filteredBlogs.map(post => {
-            const isBookmarked = readingList.some(r => r.id === post.id);
-            return (
-              <Card key={post.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col justify-between hover:shadow-md transition relative">
-                <div>
-                  <div className="h-56 overflow-hidden relative">
-                    <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
-                    {(!user || user.role === 'customer') && (
-                      <button 
-                        onClick={() => handleToggleReadingList(post.id)}
-                        className="absolute right-4 top-4 h-10 w-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition"
-                      >
-                        <Bookmark className={`h-5 w-5 ${isBookmarked ? 'fill-blue-600 text-blue-600' : 'text-neutral-700'}`} />
-                      </button>
-                    )}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredBlogs.length > 0 ? (
+            filteredBlogs.map(post => {
+              const isBookmarked = readingList.some(r => r.id === post.id);
+              return (
+                <Card key={post.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col justify-between hover:shadow-md transition relative">
+                  <div>
+                    <div className="h-56 overflow-hidden relative">
+                      <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                      {(!user || user.role === 'customer') && (
+                        <button 
+                          onClick={() => handleToggleReadingList(post.id)}
+                          className="absolute right-4 top-4 h-10 w-10 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition"
+                        >
+                          <Bookmark className={`h-5 w-5 ${isBookmarked ? 'fill-blue-600 text-blue-600' : 'text-neutral-700'}`} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="p-6 space-y-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-green-800 bg-green-50 px-3 py-1 rounded-full border border-green-700/10">
+                        {post.category}
+                      </span>
+                      <h2 className="text-2xl font-bold text-neutral-955 leading-tight pt-1 cursor-pointer hover:text-green-800" onClick={() => navigateTo("blog-detail", { slug: post.slug })}>{post.title}</h2>
+                      <p className="text-neutral-700 text-sm leading-relaxed line-clamp-3">{post.teaser}</p>
+                    </div>
                   </div>
-                  <div className="p-6 space-y-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-green-800 bg-green-50 px-3 py-1 rounded-full border border-green-700/10">
-                      {post.category}
-                    </span>
-                    <h2 className="text-2xl font-bold text-neutral-955 leading-tight pt-1 cursor-pointer hover:text-green-800" onClick={() => navigateTo("blog-detail", { slug: post.slug })}>{post.title}</h2>
-                    <p className="text-neutral-700 text-sm leading-relaxed">{post.teaser}</p>
+                  <div className="p-6 pt-0 flex items-center justify-between border-t border-neutral-50 mt-4">
+                    <span className="text-xs text-neutral-500">{post.publishDate}</span>
+                    <Button 
+                      variant="ghost" 
+                      className="text-green-800 font-semibold"
+                      onClick={() => navigateTo("blog-detail", { slug: post.slug })}
+                    >
+                      Weiterlesen &rarr;
+                    </Button>
                   </div>
-                </div>
-                <div className="p-6 pt-0 flex items-center justify-between border-t border-neutral-50 mt-4">
-                  <span className="text-xs text-neutral-500">{post.publishDate}</span>
-                  <Button 
-                    variant="ghost" 
-                    className="text-green-800 font-semibold"
-                    onClick={() => navigateTo("blog-detail", { slug: post.slug })}
-                  >
-                    Weiterlesen &rarr;
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
+                </Card>
+              );
+            })
+          ) : (
+            <div className="col-span-full text-center py-12 text-neutral-500">
+              Keine Blogbeiträge zu diesem Suchbegriff gefunden.
+            </div>
+          )}
         </div>
       </div>
     );
