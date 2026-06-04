@@ -154,8 +154,10 @@ export default function HofladenWebAppStartseite() {
         console.error("Failed to load blogs", err);
       }
     };
-    loadBlogs();
-  }, []);
+    if (view === 'blog' || view === 'blog-detail' || blogs.length === 0) {
+      loadBlogs();
+    }
+  }, [view]);
 
   useEffect(() => {
     const loadEvents = async () => {
