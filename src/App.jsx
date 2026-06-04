@@ -36,14 +36,14 @@ function Logo({ onClick }) {
   );
 }
 
-// Helper component to change map viewport when center coordinate state updates
-function ChangeMapCenter({ center }) {
+// Helper component to change map viewport when center coordinate or zoom state updates
+function ChangeMapCenter({ center, zoom }) {
   const map = useMap();
   useEffect(() => {
     if (center) {
-      map.setView(center, map.getZoom());
+      map.setView(center, zoom || map.getZoom());
     }
-  }, [center, map]);
+  }, [center, zoom, map]);
   return null;
 }
 
@@ -782,11 +782,19 @@ export default function HofladenWebAppStartseite() {
   const renderMapPreview = () => {
     const validPlaces = places.filter(p => p.lat && p.lng);
 
+    // Calculate map zoom based on search radius (in km)
+    let mapZoom = 11;
+    if (searchRadius === "2") mapZoom = 14;
+    else if (searchRadius === "5") mapZoom = 13;
+    else if (searchRadius === "10") mapZoom = 11;
+    else if (searchRadius === "25") mapZoom = 9;
+    else if (searchRadius === "50") mapZoom = 8;
+
     return (
       <div className="relative h-[330px] overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-[#e8f1e5] shadow-sm md:h-[420px] z-10">
         <MapContainer 
           center={mapCenter} 
-          zoom={11} 
+          zoom={mapZoom} 
           scrollWheelZoom={true} 
           style={{ height: "100%", width: "100%" }}
         >
@@ -794,7 +802,7 @@ export default function HofladenWebAppStartseite() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
-          <ChangeMapCenter center={mapCenter} />
+          <ChangeMapCenter center={mapCenter} zoom={mapZoom} />
           {validPlaces.map(place => (
             <Marker 
               key={place.id} 
