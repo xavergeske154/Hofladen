@@ -929,14 +929,12 @@ export default function HofladenWebAppStartseite() {
                   >
                     <Bookmark className="h-4 w-4 text-blue-500 fill-blue-500" /> Leseliste
                   </button>
-                  {user && (
-                    <button 
-                      onClick={() => { setProfileDropdownOpen(false); handleLogout(); }} 
-                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-red-600 font-semibold flex items-center gap-2 border-t border-neutral-100"
-                    >
-                      <LogOut className="h-4 w-4" /> Logout
-                    </button>
-                  )}
+                  <button 
+                    onClick={() => { setProfileDropdownOpen(false); handleLogout(); }} 
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-red-600 font-semibold flex items-center gap-2 border-t border-neutral-100"
+                  >
+                    <LogOut className="h-4 w-4" /> Logout
+                  </button>
                 </div>
               </>
             )}
