@@ -62,6 +62,27 @@ export default function HofladenWebAppStartseite() {
   const [favorites, setFavorites] = useState([]);
   const [readingList, setReadingList] = useState([]);
 
+  // Blog States
+  const [selectedBlogCat, setSelectedBlogCat] = useState("all");
+  const [blogSearch, setBlogSearch] = useState("");
+
+  // Sync guest favorites & reading list from localStorage
+  useEffect(() => {
+    if (!user) {
+      const localFavs = JSON.parse(localStorage.getItem("guest_favorites") || "[]");
+      if (places.length > 0) {
+        const favPlaces = places.filter(p => localFavs.includes(p.id));
+        setFavorites(favPlaces);
+      }
+      
+      const localRl = JSON.parse(localStorage.getItem("guest_reading_list") || "[]");
+      if (blogs.length > 0) {
+        const bookmarkedBlogs = blogs.filter(b => localRl.includes(b.id));
+        setReadingList(bookmarkedBlogs);
+      }
+    }
+  }, [user, places, blogs]);
+
   // Events & Calendar States
   const [events, setEvents] = useState([]);
   const [selectedEventCategory, setSelectedEventCategory] = useState("all");
@@ -532,66 +553,51 @@ export default function HofladenWebAppStartseite() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-4 md:flex relative">
-          {user ? (
-            <div className="relative">
-              <button 
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} 
-                className="flex items-center gap-2 bg-white px-3 py-2 rounded-full border border-neutral-200 hover:shadow-sm transition"
-              >
-                <div className="h-8 w-8 bg-green-800 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                  {(user.profile?.name || user.email).charAt(0).toUpperCase()}
-                </div>
-                <span className="text-sm font-semibold text-neutral-700 max-w-[120px] truncate">{user.profile?.name || user.email}</span>
-                <ChevronDown className="h-4 w-4 text-neutral-500" />
-              </button>
+          <div className="relative">
+            <button 
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)} 
+              className="flex items-center gap-2 bg-white px-3 py-2 rounded-full border border-neutral-200 hover:shadow-sm transition"
+            >
+              <div className="h-8 w-8 bg-green-800 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                {user ? (user.profile?.name || user.email).charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+              </div>
+              <span className="text-sm font-semibold text-neutral-700 max-w-[120px] truncate">{user ? (user.profile?.name || user.email) : "Mein Bereich"}</span>
+              <ChevronDown className="h-4 w-4 text-neutral-500" />
+            </button>
 
-              {/* Profile Dropdown Menu */}
-              {profileDropdownOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-neutral-200/80 shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="px-4 py-2 border-b border-neutral-100">
-                      <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Mein Konto</p>
-                      <p className="text-sm font-bold text-neutral-800 truncate">{user.email}</p>
-                    </div>
-                    {user.role === 'customer' && (
-                      <>
-                        <button 
-                          onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
-                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
-                        >
-                          <Heart className="h-4 w-4 text-red-500 fill-red-500" /> Favoriten
-                        </button>
-                        <button 
-                          onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
-                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
-                        >
-                          <Bookmark className="h-4 w-4 text-blue-500 fill-blue-500" /> Leseliste
-                        </button>
-                      </>
-                    )}
-                    <button 
-                      onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
-                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
-                    >
-                      <User className="h-4 w-4 text-green-800" /> Mein Bereich
-                    </button>
+            {/* Profile Dropdown Menu */}
+            {profileDropdownOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-neutral-200/80 shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="px-4 py-2 border-b border-neutral-100">
+                    <p className="text-xs text-neutral-400 font-semibold uppercase tracking-wider">Konto-Modus</p>
+                    <p className="text-sm font-bold text-neutral-800 truncate">{user ? user.email : "Gast-Modus"}</p>
+                  </div>
+                  <button 
+                    onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
+                  >
+                    <Heart className="h-4 w-4 text-red-500 fill-red-500" /> Favoriten
+                  </button>
+                  <button 
+                    onClick={() => { setProfileDropdownOpen(false); navigateTo("dashboard"); }} 
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-neutral-700 flex items-center gap-2"
+                  >
+                    <Bookmark className="h-4 w-4 text-blue-500 fill-blue-500" /> Leseliste
+                  </button>
+                  {user && (
                     <button 
                       onClick={() => { setProfileDropdownOpen(false); handleLogout(); }} 
                       className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 text-red-600 font-semibold flex items-center gap-2 border-t border-neutral-100"
                     >
                       <LogOut className="h-4 w-4" /> Abmelden
                     </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <Button variant="ghost" className="rounded-full" onClick={() => navigateTo("login")}><LogIn className="mr-2 h-4 w-4" /> Login</Button>
-              <Button className="rounded-full bg-green-800 hover:bg-green-900" onClick={() => navigateTo("register")}>Registrieren</Button>
-            </div>
-          )}
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Mobile Nav Toggle */}
@@ -614,18 +620,11 @@ export default function HofladenWebAppStartseite() {
             <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Blog</button>
             <button onClick={() => navigateTo("cookbook")} className="text-left py-2 border-b border-neutral-100">Kochbuch</button>
             <button onClick={() => navigateTo("affiliates")} className="text-left py-2 border-b border-neutral-100">Garten-Shop</button>
-            {user ? (
-              <>
-                <button onClick={() => navigateTo("dashboard")} className="text-left py-2 border-b border-neutral-100">Mein Bereich</button>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium text-neutral-600">{user.email}</span>
-                  <Button variant="outline" className="rounded-full" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Abmelden</Button>
-                </div>
-              </>
-            ) : (
-              <div className="flex flex-col gap-2 pt-2">
-                <Button variant="outline" className="rounded-full bg-white w-full" onClick={() => navigateTo("login")}><LogIn className="mr-2 h-4 w-4" /> Anmelden</Button>
-                <Button variant="ghost" className="rounded-full w-full" onClick={() => navigateTo("register")}><User className="mr-2 h-4 w-4" /> Registrieren</Button>
+            <button onClick={() => navigateTo("dashboard")} className="text-left py-2 border-b border-neutral-100">Mein Bereich (Merkliste)</button>
+            {user && (
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm font-medium text-neutral-600">{user.email}</span>
+                <Button variant="outline" className="rounded-full" onClick={handleLogout}><LogOut className="mr-2 h-4 w-4" /> Abmelden</Button>
               </div>
             )}
           </motion.div>
@@ -689,7 +688,7 @@ export default function HofladenWebAppStartseite() {
             <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-green-800 shadow-sm">
               {place.status || 'Aktiv'}
             </div>
-            {user && user.role === 'customer' && (
+            {(!user || user.role === 'customer') && (
               <button 
                 onClick={(e) => { e.stopPropagation(); handleToggleFavorite(place.id); }} 
                 className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-sm hover:scale-105 active:scale-95 transition"
@@ -859,28 +858,23 @@ export default function HofladenWebAppStartseite() {
         <aside id="anbieter" className="space-y-4">
           <Card className="rounded-[2rem] border-green-100 bg-green-900 text-white shadow-sm overflow-hidden">
             <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-100">Für Hofläden & Stationen</div>
-              <h3 className="text-2xl font-bold">Als Anbieter registrieren</h3>
+              <div className="mb-3 text-sm font-semibold text-green-100">Regional & Frisch</div>
+              <h3 className="text-2xl font-bold">Hofladen-Finder</h3>
               <p className="mt-4 text-sm leading-relaxed text-green-50">
-                Registriere deinen Hofladen, Milchstation, Eierstation oder Automaten völlig kostenlos. 
-                Erstelle ein Profil mit Bildern, Öffnungszeiten, Produkten, Events und deinem genauen Standort, um Kunden in deiner Region zu erreichen.
+                Unterstütze die Landwirtschaft in deiner Region! Entdecke frische Milch, Eier, Gemüse und handgemachte Produkte direkt ab Hof. Alle Stationen bieten kurze Transportwege und maximale Frische.
               </p>
-              <Button className="mt-6 w-full rounded-full bg-white py-6 text-green-900 hover:bg-green-50 font-bold" onClick={() => navigateTo(user ? "dashboard" : "register", { role: "vendor" })}>
-                Anbieter-Konto erstellen
-              </Button>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] bg-[#faf8f2] border border-green-800/10 shadow-sm">
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
             <CardContent className="p-6">
-              <div className="mb-3 text-sm font-semibold text-green-800">Für Kunden & Entdecker</div>
-              <h3 className="text-2xl font-bold text-green-950">Kundenkonto anlegen</h3>
+              <div className="mb-3 text-sm font-semibold text-green-850">Deine Merkliste</div>
+              <h3 className="text-2xl font-bold text-green-950">Favoriten & Leseliste</h3>
               <p className="mt-4 text-sm leading-relaxed text-neutral-700">
-                Melde dich kostenlos an, um deine Lieblings-Hofläden in deinen Favoriten zu speichern, 
-                spannende Ratgeber in deiner Leseliste zu sichern und deine Reservierungen zu verwalten.
+                Markiere Hofläden mit dem Herz-Symbol und speichere nützliche Blogartikel mit dem Lesezeichen ab. Sie werden automatisch in deinem Browser gesichert, damit du sie jederzeit wiederfindest.
               </p>
-              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold" onClick={() => navigateTo(user ? "dashboard" : "register", { role: "customer" })}>
-                <User className="mr-2 h-4 w-4" /> Jetzt kostenlos anmelden
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold" onClick={() => navigateTo("dashboard")}>
+                Meine Merkliste öffnen
               </Button>
             </CardContent>
           </Card>
@@ -1078,9 +1072,6 @@ export default function HofladenWebAppStartseite() {
 
   // 3. BLOG LIST PAGE
   const renderBlogList = () => {
-    const [selectedBlogCat, setSelectedBlogCat] = useState("all");
-    const [blogSearch, setBlogSearch] = useState("");
-
     const filteredBlogs = blogs.filter(b => {
       const matchesCategory = selectedBlogCat === "all" || b.category.toLowerCase() === selectedBlogCat.toLowerCase();
       const matchesSearch = b.title.toLowerCase().includes(blogSearch.toLowerCase()) || 
