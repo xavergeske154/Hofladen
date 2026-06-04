@@ -88,6 +88,28 @@ function EventImage({ src, alt }) {
   );
 }
 
+function BlogImage({ src, alt }) {
+  const [error, setError] = useState(false);
+  
+  if (error || !src) {
+    return (
+      <div className="w-full h-full bg-gradient-to-br from-green-50 to-green-100 flex flex-col items-center justify-center text-green-800 p-4">
+        <BookOpen className="h-10 w-10 text-green-700/40 mb-2" />
+        <span className="text-xs font-bold text-center leading-tight max-w-[180px] truncate">{alt}</span>
+      </div>
+    );
+  }
+  
+  return (
+    <img 
+      src={src} 
+      alt={alt} 
+      onError={() => setError(true)} 
+      className="w-full h-full object-cover" 
+    />
+  );
+}
+
 function Logo({ onClick }) {
   return (
     <div className="flex items-center gap-3 cursor-pointer select-none" onClick={onClick}>
@@ -1572,7 +1594,7 @@ export default function HofladenWebAppStartseite() {
                 <Card key={post.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col justify-between hover:shadow-md transition relative">
                   <div>
                     <div className="h-56 overflow-hidden relative">
-                      <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                      <BlogImage src={post.image} alt={post.title} />
                       {(!user || user.role === 'customer') && (
                         <button 
                           onClick={() => handleToggleReadingList(post.id)}
@@ -1629,7 +1651,7 @@ export default function HofladenWebAppStartseite() {
 
         <Card className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white">
           <div className="h-[350px] relative">
-            <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+            <BlogImage src={post.image} alt={post.title} />
             {(!user || user.role === 'customer') && (
               <button 
                 onClick={() => handleToggleReadingList(post.id)}
@@ -2263,7 +2285,9 @@ export default function HofladenWebAppStartseite() {
               readingList.map(post => (
                 <Card key={post.id} className="p-4 bg-white border-neutral-200 rounded-2xl shadow-sm flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <img src={post.image} alt={post.title} className="h-16 w-16 rounded-xl object-cover" />
+                    <div className="h-16 w-16 rounded-xl overflow-hidden shrink-0">
+                      <BlogImage src={post.image} alt={post.title} />
+                    </div>
                     <div>
                       <h3 className="font-bold hover:text-green-800 cursor-pointer" onClick={() => navigateTo("blog-detail", { slug: post.slug })}>{post.title}</h3>
                       <p className="text-xs text-green-800 font-semibold">{post.category}</p>
