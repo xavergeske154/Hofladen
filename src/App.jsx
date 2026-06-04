@@ -94,10 +94,11 @@ function ChangeMapCenter({ center, zoom }) {
 const getMarkerIcon = (category) => {
   let color = "bg-green-800";
   let iconHtml = "";
+  const isSearch = category === "search";
 
-  if (category === "search") {
+  if (isSearch) {
     color = "bg-rose-600 animate-pulse";
-    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
   } else if (category === "hofladen") {
     color = "bg-green-800";
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
@@ -115,18 +116,21 @@ const getMarkerIcon = (category) => {
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="5" rx="1"/><line x1="6" y1="7" x2="6" y2="12"/><line x1="18" y1="7" x2="18" y2="12"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><line x1="9" y1="12" x2="9" y2="21"/><line x1="15" y1="12" x2="15" y2="21"/></svg>`;
   } else if (category === "sb_laden") {
     color = "bg-purple-600";
-    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
   } else {
     color = "bg-green-700";
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
   }
 
+  const size = isSearch ? 32 : 40;
+  const divSizeClass = isSearch ? "h-8 w-8" : "h-10 w-10";
+
   return L.divIcon({
-    html: `<div class="flex h-10 w-10 items-center justify-center rounded-t-full rounded-bl-full ${color} -rotate-45 shadow-md text-white border-2 border-white"><div class="rotate-45">${iconHtml}</div></div>`,
+    html: `<div class="flex ${divSizeClass} items-center justify-center rounded-t-full rounded-bl-full ${color} rotate-45 shadow-md text-white border-2 border-white"><div class="-rotate-45 flex items-center justify-center">${iconHtml}</div></div>`,
     className: "custom-leaflet-icon",
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size],
+    popupAnchor: [0, -size]
   });
 };
 
