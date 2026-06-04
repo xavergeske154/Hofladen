@@ -69,19 +69,35 @@ export default function HofladenWebAppStartseite() {
   // Sync guest favorites & reading list from localStorage
   useEffect(() => {
     if (!user) {
-      const localFavs = JSON.parse(localStorage.getItem("guest_favorites") || "[]");
-      if (places.length > 0) {
-        const favPlaces = places.filter(p => localFavs.includes(p.id));
-        setFavorites(favPlaces);
-      }
-      
-      const localRl = JSON.parse(localStorage.getItem("guest_reading_list") || "[]");
-      if (blogs.length > 0) {
-        const bookmarkedBlogs = blogs.filter(b => localRl.includes(b.id));
-        setReadingList(bookmarkedBlogs);
-      }
+      const syncGuestData = async () => {
+        try {
+          const localFavs = JSON.parse(localStorage.getItem("guest_favorites") || "[]");
+          if (localFavs.length > 0) {
+            const allShops = await api.getFarmShops();
+            const favPlaces = allShops.filter(p => localFavs.includes(p.id));
+            setFavorites(favPlaces);
+          } else {
+            setFavorites([]);
+          }
+        } catch (err) {
+          console.error("Failed to sync guest favorites", err);
+        }
+        try {
+          const localRl = JSON.parse(localStorage.getItem("guest_reading_list") || "[]");
+          if (localRl.length > 0) {
+            const allBlogs = blogs.length > 0 ? blogs : await api.getBlogs();
+            const bookmarkedBlogs = allBlogs.filter(b => localRl.includes(b.id));
+            setReadingList(bookmarkedBlogs);
+          } else {
+            setReadingList([]);
+          }
+        } catch (err) {
+          console.error("Failed to sync guest reading list", err);
+        }
+      };
+      syncGuestData();
     }
-  }, [user, places, blogs]);
+  }, [user, blogs]);
 
   // Events & Calendar States
   const [events, setEvents] = useState([]);
@@ -357,7 +373,21 @@ export default function HofladenWebAppStartseite() {
   // Customer Actions
   const handleToggleFavorite = async (placeId) => {
     if (!user || user.role !== 'customer') {
-      navigateTo("login");
+      const localFavs = JSON.parse(localStorage.getItem("guest_favorites") || "[]");
+      let updatedFavs;
+      if (localFavs.includes(placeId)) {
+        updatedFavs = localFavs.filter(id => id !== placeId);
+      } else {
+        updatedFavs = [...localFavs, placeId];
+      }
+      localStorage.setItem("guest_favorites", JSON.stringify(updatedFavs));
+      
+      try {
+        const allShops = await api.getFarmShops();
+        setFavorites(allShops.filter(p => updatedFavs.includes(p.id)));
+      } catch (err) {
+        console.error("Error updating guest favorites", err);
+      }
       return;
     }
     
@@ -378,7 +408,21 @@ export default function HofladenWebAppStartseite() {
 
   const handleToggleReadingList = async (blogId) => {
     if (!user || user.role !== 'customer') {
-      navigateTo("login");
+      const localRl = JSON.parse(localStorage.getItem("guest_reading_list") || "[]");
+      let updatedRl;
+      if (localRl.includes(blogId)) {
+        updatedRl = localRl.filter(id => id !== blogId);
+      } else {
+        updatedRl = [...localRl, blogId];
+      }
+      localStorage.setItem("guest_reading_list", JSON.stringify(updatedRl));
+      
+      try {
+        const allBlogs = blogs.length > 0 ? blogs : await api.getBlogs();
+        setReadingList(allBlogs.filter(b => updatedRl.includes(b.id)));
+      } catch (err) {
+        console.error("Error updating guest reading list", err);
+      }
       return;
     }
 
@@ -1583,7 +1627,7 @@ export default function HofladenWebAppStartseite() {
 
   // 7. PORTAL DASHBOARDS ROUTER
   const renderDashboard = () => {
-    if (!user) return <div className="text-center py-20 text-neutral-500">Bitte melde dich an.</div>;
+    if (!user) return renderCustomerDashboard();
 
     if (user.role === 'customer') return renderCustomerDashboard();
     if (user.role === 'vendor') return renderVendorDashboard();
@@ -1603,8 +1647,8 @@ export default function HofladenWebAppStartseite() {
               <User className="h-10 w-10 text-green-800" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-neutral-900">{user.profile?.name}</h2>
-              <p className="text-xs text-neutral-500">{user.email}</p>
+              <h2 className="text-xl font-bold text-neutral-900">{user ? (user.profile?.name || "Kunde") : "Gast-Modus"}</h2>
+              <p className="text-xs text-neutral-500">{user ? user.email : "Lokale Merkliste"}</p>
             </div>
             <div className="pt-2 border-t border-neutral-100 flex justify-around text-sm font-semibold">
               <div>
@@ -1617,6 +1661,21 @@ export default function HofladenWebAppStartseite() {
                 <div className="text-xs text-neutral-500">Leseliste</div>
               </div>
             </div>
+            {!user && (
+              <div className="pt-4 border-t border-neutral-100 space-y-2">
+                <p className="text-xs text-neutral-500 leading-normal text-center">
+                  Melde dich an, um deine Merkliste dauerhaft zu speichern.
+                </p>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full rounded-full text-xs py-1"
+                  onClick={() => navigateTo("login")}
+                >
+                  Jetzt anmelden
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </aside>
@@ -1624,8 +1683,8 @@ export default function HofladenWebAppStartseite() {
       {/* Favorites, Reading list & Settings */}
       <main className="space-y-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-green-950">Kundenkonto</h1>
-          <p className="text-neutral-500">Verwalte deine Profileinstellungen, favorisierten Einkaufsorte und Leseliste.</p>
+          <h1 className="text-3xl font-extrabold text-green-950">{user ? "Kundenkonto" : "Mein Bereich (Gast)"}</h1>
+          <p className="text-neutral-500">{user ? "Verwalte deine Profileinstellungen, favorisierten Einkaufsorte und Leseliste." : "Hier findest du deine lokal gespeicherten Favoriten und Lesezeichen."}</p>
         </div>
 
         {/* Favorite shops list */}
