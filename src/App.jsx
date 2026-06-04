@@ -536,6 +536,9 @@ export default function HofladenWebAppStartseite() {
       } else if (hash === "#/hofmarkt") {
         setView("hofmarkt");
         setViewParams({});
+      } else if (hash === "#/support") {
+        setView("support");
+        setViewParams({});
       } else if (hash === "#/dashboard") {
         setView("dashboard");
         setViewParams({});
@@ -2138,6 +2141,109 @@ export default function HofladenWebAppStartseite() {
     );
   };
 
+  // Support / Donation Page
+  const renderSupport = () => {
+    const options = [
+      { id: "coffee", icon: "☕", title: "Kaffee ausgeben", price: "3 €", desc: "Hilft bei den laufenden Serverkosten." },
+      { id: "breakfast", icon: "🥚", title: "Frühstück unterstützen", price: "5 €", desc: "Deckt die Kosten für Karten und Datenpflege." },
+      { id: "regional", icon: "🥔", title: "Regionalförderer", price: "10 €", desc: "Hilft dabei, neue Hofläden einzutragen und die Plattform auszubauen." },
+      { id: "project", icon: "🌻", title: "Projektförderer", price: "25 €", desc: "Unterstützt die langfristige Weiterentwicklung von Hofladen-Finder." }
+    ];
+
+    return (
+      <div className="max-w-4xl mx-auto space-y-10">
+        <div className="text-center space-y-3">
+          <span className="text-3xl">🌱</span>
+          <h1 className="text-4xl font-extrabold text-green-950">Unterstütze Hofladen-Finder</h1>
+          <p className="text-neutral-600 max-w-2xl mx-auto leading-relaxed">
+            Hofladen-Finder ist ein unabhängiges Projekt, das Menschen mit regionalen Erzeugern verbindet. Die Nutzung bleibt zu 100% kostenlos und werbefrei. Mit deiner Unterstützung können wir neue Hofläden erfassen, die Plattform weiterentwickeln und die laufenden Serverkosten decken.
+          </p>
+        </div>
+
+        {/* Social Proof Progress Bar */}
+        <Card className="rounded-[2.5rem] border-neutral-200 bg-white p-8 shadow-sm">
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-sm md:text-base font-bold text-neutral-800">
+              <span className="flex items-center gap-2 text-green-800">
+                <CheckCircle className="h-5 w-5 text-green-600 animate-pulse" />
+                Bereits unterstützt von 127 Hofladen-Freunden.
+              </span>
+              <span className="text-neutral-500">Ziel 2026: 500 Unterstützer</span>
+            </div>
+            
+            {/* Progress Bar container */}
+            <div className="w-full h-4 bg-neutral-100 rounded-full overflow-hidden relative border border-neutral-200">
+              <div 
+                className="h-full bg-gradient-to-r from-green-700 to-emerald-600 rounded-full transition-all duration-1000" 
+                style={{ width: "25.4%" }}
+              />
+            </div>
+            <div className="text-right text-xs font-bold text-neutral-500">
+              25.4% des Jahresziels erreicht (127 von 500 Unterstützern)
+            </div>
+          </div>
+        </Card>
+
+        {/* Contribution options grid */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-neutral-900 text-center">Wähle deinen Beitrag</h2>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {options.map(opt => (
+              <Card key={opt.id} className="p-6 bg-white border-neutral-200 rounded-[2rem] flex flex-col justify-between hover:shadow-md transition">
+                <div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-3xl">{opt.icon}</span>
+                    <span className="text-2xl font-black text-green-900">{opt.price}</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-neutral-900 mt-4">{opt.title}</h3>
+                  <p className="text-neutral-600 text-sm mt-1 leading-relaxed">{opt.desc}</p>
+                </div>
+                <Button 
+                  className="rounded-full bg-green-800 hover:bg-green-900 font-bold mt-6 w-full py-5"
+                  onClick={() => alert(`Vielen Dank für deine Unterstützung über ${opt.price}! Weiterleitung zu PayPal...`)}
+                >
+                  Mit {opt.price} unterstützen
+                </Button>
+              </Card>
+            ))}
+
+            {/* Custom Amount option */}
+            <Card className="p-6 bg-white border-neutral-200 rounded-[2rem] sm:col-span-2 flex flex-col justify-between hover:shadow-md transition">
+              <div>
+                <div className="flex justify-between items-start">
+                  <span className="text-3xl">❤️</span>
+                  <span className="text-sm font-bold uppercase tracking-wider text-green-800 bg-green-50 px-3 py-1 rounded-full border border-green-200">Freier Betrag</span>
+                </div>
+                <h3 className="text-lg font-bold text-neutral-900 mt-4">Freier Betrag</h3>
+                <p className="text-neutral-600 text-sm mt-1 leading-relaxed">Jeder Beitrag hilft. Lege selbst fest, wie viel du spenden möchtest.</p>
+              </div>
+              <div className="mt-6 flex flex-col sm:flex-row gap-4 items-center">
+                <div className="relative w-full sm:w-48">
+                  <input 
+                    type="number" 
+                    min="1"
+                    placeholder="Betrag"
+                    className="w-full bg-neutral-50 border border-neutral-200 rounded-full py-3 px-6 text-sm font-bold outline-none pr-10"
+                    id="custom-donation-amount"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 font-extrabold text-neutral-500 text-sm">€</span>
+                </div>
+                <Button 
+                  className="rounded-full bg-green-800 hover:bg-green-900 font-bold w-full sm:flex-1 py-5"
+                  onClick={() => {
+                    const amount = document.getElementById("custom-donation-amount")?.value || "10";
+                    alert(`Vielen Dank für deine Unterstützung über ${amount} €! Weiterleitung zu PayPal...`);
+                  }}
+                >
+                  Jetzt unterstützen
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // 5. LOGIN PAGE
   const renderLogin = () => (
@@ -2967,14 +3073,14 @@ export default function HofladenWebAppStartseite() {
           <div className="bg-gradient-to-r from-emerald-800 to-green-900 text-white py-4 px-6 relative text-center text-sm md:text-base font-semibold shadow-md flex flex-col sm:flex-row items-center justify-center gap-3">
             <span className="flex items-center gap-2">
               <HeartHandshake className="h-5 w-5 text-green-300 shrink-0" />
-              <span>Hofladen-Finder ist gemeinnützig & werbefrei. Hilf uns mit einer kleinen jährlichen Spende (z.B. 5 €), die Serverkosten zu decken.</span>
+              <span>🌱 <strong>Dir gefällt Hofladen-Finder?</strong> Hilf uns, die Plattform kostenlos, unabhängig und werbefrei zu halten. Schon wenige Euro im Jahr helfen bei Serverkosten und Weiterentwicklung.</span>
             </span>
             <div className="flex gap-2 shrink-0">
               <Button 
-                onClick={() => alert("Vielen Dank für deine Unterstützung! Weiterleitung zu PayPal...")}
+                onClick={() => navigateTo("support")}
                 className="bg-white text-green-900 rounded-full h-8 px-4 text-xs font-bold hover:bg-neutral-50 shadow-sm"
               >
-                Jetzt Spenden
+                ❤️ Jetzt unterstützen
               </Button>
               <Button 
                 onClick={() => {
@@ -2998,6 +3104,7 @@ export default function HofladenWebAppStartseite() {
             {view === 'blog-detail' && renderBlogDetail()}
             {view === 'events' && renderEvents()}
             {view === 'hofmarkt' && renderHofmarkt()}
+            {view === 'support' && renderSupport()}
             {view === 'login' && renderLogin()}
             {view === 'register' && renderRegister()}
             {view === 'dashboard' && renderDashboard()}
@@ -3054,6 +3161,7 @@ export default function HofladenWebAppStartseite() {
             <button onClick={() => navigateTo("events")} className="hover:underline">Events</button>
             <button onClick={() => navigateTo("blog")} className="hover:underline">Blog</button>
             <button onClick={() => navigateTo("hofmarkt")} className="hover:underline">Hofmarkt</button>
+            <button onClick={() => navigateTo("support")} className="hover:underline text-red-600 font-bold">❤️ Unterstütze uns</button>
             <button onClick={() => navigateTo("login")} className="hover:underline">Anbieter-Portal</button>
           </div>
         </div>
