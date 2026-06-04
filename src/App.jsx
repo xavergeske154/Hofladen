@@ -14,13 +14,55 @@ import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
 
+const VendingMachineIcon = (props) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    {...props}
+  >
+    <rect x="5" y="2" width="14" height="20" rx="2" />
+    <rect x="7" y="5" width="10" height="8" rx="1" />
+    <line x1="9" y1="8" x2="15" y2="8" />
+    <line x1="9" y1="11" x2="15" y2="11" />
+    <rect x="7" y="15" width="5" height="4" rx="1" />
+    <rect x="14" y="15" width="3" height="2" rx="0.5" />
+    <circle cx="15.5" cy="19" r="0.5" />
+  </svg>
+);
+
+const StallIcon = (props) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    {...props}
+  >
+    <rect x="4" y="2" width="16" height="5" rx="1" />
+    <line x1="6" y1="7" x2="6" y2="12" />
+    <line x1="18" y1="7" x2="18" y2="12" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8" />
+    <line x1="9" y1="12" x2="9" y2="21" />
+    <line x1="15" y1="12" x2="15" y2="21" />
+  </svg>
+);
+
 const categories = [
   { id: "all", label: "Alle", icon: Store },
   { id: "hofladen", label: "Hofladen", icon: Home },
-  { id: "automat", label: "Automat", icon: Store },
+  { id: "automat", label: "Automat", icon: VendingMachineIcon },
   { id: "milch", label: "Milchstation", icon: Milk },
   { id: "eier", label: "Eierstation", icon: Egg },
-  { id: "stand", label: "Verkaufsstand", icon: Store },
+  { id: "stand", label: "Verkaufsstand", icon: StallIcon },
   { id: "sb_laden", label: "Selbstbedienungsladen", icon: ShoppingBag },
 ];
 
@@ -67,10 +109,10 @@ const getMarkerIcon = (category) => {
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-2.7-10-8-10S4 8.5 4 14a8 8 0 0 0 8 8z"/></svg>`;
   } else if (category === "automat") {
     color = "bg-orange-500";
-    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><rect x="7" y="5" width="10" height="8" rx="1"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="11" x2="15" y2="11"/><rect x="7" y="15" width="5" height="4" rx="1"/><rect x="14" y="15" width="3" height="2" rx="0.5"/><circle cx="15.5" cy="19" r="0.5"/></svg>`;
   } else if (category === "stand") {
     color = "bg-teal-600";
-    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="5" rx="1"/><line x1="6" y1="7" x2="6" y2="12"/><line x1="18" y1="7" x2="18" y2="12"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/><line x1="9" y1="12" x2="9" y2="21"/><line x1="15" y1="12" x2="15" y2="21"/></svg>`;
   } else if (category === "sb_laden") {
     color = "bg-purple-600";
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
