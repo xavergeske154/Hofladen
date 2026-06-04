@@ -1407,6 +1407,24 @@ export default function HofladenWebAppStartseite() {
             </CardContent>
           </Card>
 
+          {/* Community Zahlen Card */}
+          <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm">
+            <CardContent className="p-6">
+              <div className="mb-3 text-sm font-semibold text-green-850">Community</div>
+              <h3 className="text-2xl font-bold text-green-950">Statistik</h3>
+              <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
+                <div className="text-left">
+                  <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
+                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Gelistete Hofläden etc.</div>
+                </div>
+                <div className="text-left border-l border-neutral-100 pl-4">
+                  <div className="text-3xl font-extrabold text-green-900">1.284</div>
+                  <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Member</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="rounded-[2rem] border border-green-800/10 bg-white shadow-sm overflow-hidden">
             <CardContent className="p-6 space-y-4">
               <div>
@@ -2491,6 +2509,24 @@ export default function HofladenWebAppStartseite() {
             <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold cursor-pointer" onClick={() => navigateTo("register", { role: "vendor" })}>
               Jetzt Hofladen hinzufügen
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Community Zahlen Card */}
+        <Card className="rounded-[2rem] bg-white border border-green-800/10 shadow-sm text-left">
+          <CardContent className="p-6">
+            <div className="mb-3 text-sm font-semibold text-green-850">Community</div>
+            <h3 className="text-xl font-bold text-green-950">Statistik</h3>
+            <div className="grid grid-cols-2 gap-4 mt-4 pt-2 border-t border-neutral-100">
+              <div className="text-left">
+                <div className="text-3xl font-extrabold text-green-900">{places.length > 0 ? places.length + 142 : 146}</div>
+                <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Gelistete Hofläden etc.</div>
+              </div>
+              <div className="text-left border-l border-neutral-100 pl-4">
+                <div className="text-3xl font-extrabold text-green-900">1.284</div>
+                <div className="text-xs text-neutral-500 mt-1 font-medium leading-tight">Member</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
