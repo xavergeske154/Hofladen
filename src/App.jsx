@@ -1002,68 +1002,7 @@ export default function HofladenWebAppStartseite() {
               </div>
             </div>
 
-            {/* Too Good To Go Retter-Tüten Section */}
-            <div className="border-t border-neutral-100 pt-8 col-span-full">
-              <h3 className="font-bold text-xl text-neutral-900 flex items-center gap-2 mb-4">
-                <ShoppingBag className="h-5.5 w-5.5 text-green-800" /> Retter-Tüten (Too Good To Go Modell)
-              </h3>
-              {packages.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {packages.map(pkg => (
-                    <Card key={pkg.id} className="p-5 bg-green-50/30 border-green-100/60 rounded-2xl flex flex-col justify-between shadow-sm">
-                      <div>
-                        <div className="flex justify-between items-start gap-2">
-                          <h4 className="font-bold text-lg text-neutral-900">{pkg.title}</h4>
-                          <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${pkg.quantity > 0 ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-50 text-red-600 border border-red-100'}`}>
-                            {pkg.quantity > 0 ? `${pkg.quantity} verfügbar` : 'Ausverkauft'}
-                          </span>
-                        </div>
-                        <p className="text-sm text-neutral-600 mt-2">{pkg.description}</p>
-                        
-                        <div className="flex gap-4 mt-4 text-xs text-neutral-500 font-medium">
-                          <div><strong>Abholung:</strong> {pkg.pickupTime}</div>
-                          <div><strong>Originalpreis:</strong> <span className="line-through">{pkg.originalValue.toFixed(2)} €</span></div>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-between mt-5 pt-4 border-t border-green-100/30">
-                        <div className="text-xl font-extrabold text-green-900">
-                          {pkg.price.toFixed(2)} €
-                        </div>
-                        <Button 
-                          disabled={pkg.quantity <= 0}
-                          className="rounded-full bg-green-800 hover:bg-green-900 text-xs px-5 h-10 font-bold"
-                          onClick={async () => {
-                            if (!user) {
-                              navigateTo("login");
-                              return;
-                            }
-                            if (user.role !== 'customer') {
-                              alert("Bitte melden Sie sich als Kunde an, um Retter-Tüten zu reservieren.");
-                              return;
-                            }
-                            try {
-                              await api.reservePackage(pkg.id);
-                              alert("Reservierung erfolgreich! Bezahlung erfolgt bar bei Abholung.");
-                              const updated = await api.getPackages(shop.id);
-                              setPackages(updated);
-                            } catch (err) {
-                              alert(err.message || "Reservierungsfehler");
-                            }
-                          }}
-                        >
-                          Tüte reservieren
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-sm text-neutral-500 italic p-4 bg-neutral-50 rounded-xl border border-neutral-100">
-                  Momentan sind keine Retter-Tüten für diesen Hofladen eingestellt.
-                </div>
-              )}
-            </div>
           </CardContent>
         </Card>
       </motion.div>
