@@ -104,7 +104,7 @@ const getMarkerIcon = (category) => {
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
   } else if (category === "milch") {
     color = "bg-blue-600";
-    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-milk"><path d="M8 2h8"/><path d="M9 2v2.78c0 .26.11.51.3.7l3.4 3.4c.19.19.3.44.3.7V20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V9.58c0-.26.11-.51.3-.7l3.4-3.4c.19-.19.3-.44.3-.7V2"/><path d="M6 12h12"/><path d="M6 16h12"/></svg>`;
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-milk"><path d="M8 2h8v4a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V2Z"/><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1"/></svg>`;
   } else if (category === "eier") {
     color = "bg-amber-800";
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-2.7-10-8-10S4 8.5 4 14a8 8 0 0 0 8 8z"/></svg>`;
@@ -126,7 +126,7 @@ const getMarkerIcon = (category) => {
   const divSizeClass = isSearch ? "h-8 w-8" : "h-10 w-10";
 
   return L.divIcon({
-    html: `<div class="flex ${divSizeClass} items-center justify-center rounded-t-full rounded-bl-full ${color} rotate-45 shadow-md text-white border-2 border-white"><div class="-rotate-45 flex items-center justify-center">${iconHtml}</div></div>`,
+    html: `<div class="flex ${divSizeClass} items-center justify-center rounded-t-full rounded-bl-full ${color} rotate-45 shadow-md text-white border-2 border-white"><div style="transform: rotate(-45deg);" class="flex items-center justify-center">${iconHtml}</div></div>`,
     className: "custom-leaflet-icon",
     iconSize: [size, size],
     iconAnchor: [size / 2, size],
