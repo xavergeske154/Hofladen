@@ -5,21 +5,21 @@
       "email": "admin@hofladen.de",
       "passwordHash": "YWRtaW5wYXNz",
       "role": "admin",
-      "createdAt": "2026-06-04T13:17:31.411Z"
+      "createdAt": "2026-06-04T13:17:58.613Z"
     },
     {
       "id": "u-kunde",
       "email": "kunde@hofladen.de",
       "passwordHash": "a3VuZGVwYXNz",
       "role": "customer",
-      "createdAt": "2026-06-04T13:17:31.415Z"
+      "createdAt": "2026-06-04T13:17:58.614Z"
     },
     {
       "id": "u-bauer",
       "email": "bauer@hofladen.de",
       "passwordHash": "YmF1ZXJwYXNz",
       "role": "vendor",
-      "createdAt": "2026-06-04T13:17:31.415Z"
+      "createdAt": "2026-06-04T13:17:58.614Z"
     }
   ],
   "customer_profiles": [

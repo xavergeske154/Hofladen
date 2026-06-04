@@ -85,6 +85,25 @@ const DEFAULT_DATA = {
       accent: "brown",
       approved: true,
       ownerId: "u-bauer"
+    },
+    {
+      id: 4,
+      name: "Mahlbergs Biogarten",
+      type: "Hofladen",
+      category: "hofladen",
+      distance: "0,5 km",
+      address: "Brüsseler Str. 33, 53909 Zülpich",
+      lat: 50.6923,
+      lng: 6.6433,
+      hours: "Mi & Fr 15:00 - 18:00 Uhr",
+      status: "Geöffnet",
+      rating: "4.9",
+      reviews: "42",
+      description: "Frisches Bio-Gemüse, Äpfel, Kartoffeln, Eier und Kräuter direkt aus eigenem Anbau. Abholung im Hofladen.",
+      image: "https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&w=900&q=80",
+      accent: "green",
+      approved: true,
+      ownerId: "u-bauer"
     }
   ],
   blog_posts: [

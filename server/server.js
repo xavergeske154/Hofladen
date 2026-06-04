@@ -28,6 +28,9 @@ const geocodeAddress = (address) => {
   if (cleanAddr.includes("grafing") || cleanAddr.includes("85567")) {
     return { lat: 48.0478 + (Math.random() - 0.5) * 0.01, lng: 11.9664 + (Math.random() - 0.5) * 0.01 };
   }
+  if (cleanAddr.includes("zülpich") || cleanAddr.includes("53909")) {
+    return { lat: 50.6923 + (Math.random() - 0.5) * 0.01, lng: 6.6433 + (Math.random() - 0.5) * 0.01 };
+  }
   
   let hash = 0;
   for (let i = 0; i < address.length; i++) {
@@ -220,9 +223,10 @@ app.get('/api/farm-shops', (req, res) => {
   if (plz) {
     const rKm = parseInt(radius) || 10;
     const distanceMatrix = {
-      '85560': { 1: 1.2, 2: 6.5, 3: 9.8 },
-      '85604': { 1: 7.2, 2: 0.8, 3: 8.1 },
-      '85567': { 1: 9.2, 2: 7.9, 3: 1.5 },
+      '85560': { 1: 1.2, 2: 6.5, 3: 9.8, 4: 450 },
+      '85604': { 1: 7.2, 2: 0.8, 3: 8.1, 4: 460 },
+      '85567': { 1: 9.2, 2: 7.9, 3: 1.5, 4: 455 },
+      '53909': { 1: 450, 2: 460, 3: 455, 4: 0.5 }
     };
 
     const targetDistances = distanceMatrix[plz.trim()];
