@@ -1795,20 +1795,12 @@ export default function HofladenWebAppStartseite() {
                       <Calendar className="h-4 w-4 text-green-850" /> {event.date}
                     </div>
                     <div className="flex gap-2">
-                      {event.farmShopId && (
-                        <Button 
-                          variant="outline" 
-                          className="rounded-full text-xs cursor-pointer"
-                          onClick={() => navigateTo("farm-detail", { id: event.farmShopId })}
-                        >
-                          Hofladen ansehen
-                        </Button>
-                      )}
                       <Button 
-                        className="rounded-full bg-green-800 hover:bg-green-900 text-xs px-4 cursor-pointer"
+                        className="h-10 w-10 rounded-full bg-green-800 p-0 hover:bg-green-900 flex items-center justify-center shrink-0 cursor-pointer"
                         onClick={() => navigateToMap(event.location)}
+                        aria-label="Route anzeigen"
                       >
-                        Auf Karte anzeigen
+                        <Navigation className="h-4.5 w-4.5 text-white" />
                       </Button>
                     </div>
                   </div>
