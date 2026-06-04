@@ -66,6 +66,28 @@ const categories = [
   { id: "sb_laden", label: "Selbstbedienungsladen", icon: ShoppingBag },
 ];
 
+function EventImage({ src, alt }) {
+  const [error, setError] = useState(false);
+  
+  if (error || !src) {
+    return (
+      <div className="w-full h-full bg-gradient-to-br from-green-50 to-green-100 flex flex-col items-center justify-center text-green-800 p-4">
+        <Calendar className="h-8 w-8 text-green-700/40 mb-1" />
+        <span className="text-[10px] font-bold text-center leading-tight max-w-[120px] truncate">{alt}</span>
+      </div>
+    );
+  }
+  
+  return (
+    <img 
+      src={src} 
+      alt={alt} 
+      onError={() => setError(true)} 
+      className="w-full h-full object-cover" 
+    />
+  );
+}
+
 function Logo({ onClick }) {
   return (
     <div className="flex items-center gap-3 cursor-pointer select-none" onClick={onClick}>
@@ -1738,8 +1760,8 @@ export default function HofladenWebAppStartseite() {
           {paginatedEvents.length > 0 ? (
             paginatedEvents.map(event => (
               <Card key={event.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white shadow-sm flex flex-col md:flex-row hover:shadow-md transition">
-                <div className="h-48 md:h-auto md:w-80 shrink-0 overflow-hidden">
-                  <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                <div className="h-48 md:h-auto md:w-80 shrink-0 overflow-hidden bg-neutral-50 flex items-center justify-center">
+                  <EventImage src={event.image} alt={event.title} />
                 </div>
                 <div className="p-6 flex flex-col justify-between flex-1">
                   <div>
