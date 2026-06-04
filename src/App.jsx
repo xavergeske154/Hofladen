@@ -17,9 +17,11 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-le
 const categories = [
   { id: "all", label: "Alle", icon: Store },
   { id: "hofladen", label: "Hofladen", icon: Home },
+  { id: "automat", label: "Automat", icon: Store },
   { id: "milch", label: "Milchstation", icon: Milk },
   { id: "eier", label: "Eierstation", icon: Egg },
-  { id: "automat", label: "Automaten", icon: Store },
+  { id: "stand", label: "Verkaufsstand", icon: Store },
+  { id: "sb_laden", label: "Selbstbedienungsladen", icon: ShoppingBag },
 ];
 
 function Logo({ onClick }) {
@@ -65,6 +67,12 @@ const getMarkerIcon = (category) => {
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-egg"><path d="M12 22a8 8 0 0 0 8-8c0-5.5-2.7-10-8-10S4 8.5 4 14a8 8 0 0 0 8 8z"/></svg>`;
   } else if (category === "automat") {
     color = "bg-orange-500";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
+  } else if (category === "stand") {
+    color = "bg-teal-600";
+    iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+  } else if (category === "sb_laden") {
+    color = "bg-purple-600";
     iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store"><path d="m2 7 4.4-4c.3-.3.8-.4 1.2-.4h8.8c.4 0 .9.1 1.2.4L22 7"/><path d="M9 12v-2h6v2"/><path d="M12 10v4"/><path d="M12 18H5a2 2 0 0 1-2-2V7h18v9a2 2 0 0 1-2 2h-3"/><path d="M17 18h4"/></svg>`;
   } else {
     color = "bg-green-700";
@@ -2213,9 +2221,11 @@ export default function HofladenWebAppStartseite() {
                         onChange={(e) => setVendorForm({ ...vendorForm, category: e.target.value })}
                       >
                         <option value="hofladen">Hofladen</option>
+                        <option value="automat">Automat</option>
                         <option value="milch">Milchstation</option>
                         <option value="eier">Eierstation</option>
-                        <option value="automat">Verkaufsautomat</option>
+                        <option value="stand">Verkaufsstand</option>
+                        <option value="sb_laden">Selbstbedienungsladen</option>
                       </select>
                     </div>
 
