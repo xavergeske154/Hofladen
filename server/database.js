@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DB_FILE = path.resolve(__dirname, './db.json');
 
-// Helper to encrypt passwords in plaintext for MVP structure simplicity (or simple base64, or md5/sha256 if needed. Let's keep it simple or use a basic string check since this is a local MVP).
+// Helper to encrypt passwords in plaintext for MVP structure simplicity
 const hashPassword = (password) => Buffer.from(password).toString('base64');
 
 // Default Seed Data
@@ -17,7 +17,7 @@ const DEFAULT_DATA = {
     { id: "u-bauer", email: "bauer@hofladen.de", passwordHash: hashPassword("bauerpass"), role: "vendor", createdAt: new Date().toISOString() },
   ],
   customer_profiles: [
-    { userId: "u-kunde", name: "Max Mustermann", location: "80331 München", savedFavorites: [1] }
+    { userId: "u-kunde", name: "Max Mustermann", location: "80331 München", savedFavorites: [1], readingList: ["b-4"] }
   ],
   vendor_profiles: [
     { 
@@ -125,6 +125,136 @@ Bei Eiern von regionalen Stationen sieht man das Hühnermobil meist direkt neben
 Das hat Vorteile: Rohmilch behält ihren natürlichen Fettgehalt (meist um die 4%) und alle Vitamine und Enzyme. Der Geschmack ist unvergleichlich cremig und aromatisch.
 
 Da Rohmilch jedoch nicht erhitzt wurde, kann sie natürliche Keime enthalten. Für Schwangere, Kleinkinder und immungeschwächte Personen wird empfohlen, Rohmilch vor dem Verzehr abzukochen. An Milchzapfstellen ist dieser Hinweis gesetzlich vorgeschrieben. Frische Rohmilch hält sich gekühlt etwa 2–3 Tage.`
+    },
+    {
+      id: "b-4",
+      title: "DIY: Hochbeete einfach selbst bauen",
+      slug: "diy-hochbeete-bauen",
+      teaser: "Ein eigenes Hochbeet bauen schont den Rücken, hält Schädlinge fern und steigert den Ertrag. So gelingt das Holz-Projekt.",
+      image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&q=80",
+      category: "DIY",
+      publishDate: "2026-06-01",
+      content: `Hochbeete liegen im Trend. Sie ermöglichen rückenschonendes Gärtnern und bieten ideale Wachstumsbedingungen für Salat, Kräuter und Gemüse.
+
+Materialien für ein langlebiges Holz-Hochbeet:
+- Lärchen- oder Douglasienbretter (ca. 4 cm dick)
+- Kanthölzer für die Ecken
+- Teichfolie oder Noppenbahn zur Innenauskleidung
+- Wühlmausgitter (engmaschiger Draht)
+- Schrauben aus Edelstahl
+
+Schritt-für-Schritt-Anleitung:
+1. Standort ebnen: Wählen Sie einen sonnigen Platz im Garten und stechen Sie die Grasnarbe ab.
+2. Holzrahmen verschrauben: Befestigen Sie die Bretter an den Eck-Kanthölzern, um die Kiste zu formen.
+3. Wühlmausschutz montieren: Tackern Sie den feinmaschigen Draht am Boden fest, um Nagetiere auszusperren.
+4. Folie auslegen: Kleiden Sie die Innenwände mit Noppenbahn aus, um das Holz vor ständiger Feuchtigkeit aus der Erde zu schützen.
+5. Das Schichtsystem befüllen:
+   - Unterste Schicht: Grober Holzschnitt, Äste und Zweige (ca. 20 cm) für gute Belüftung.
+   - Zweite Schicht: Rasenschnitt, Laub oder feineres Astwerk (ca. 15 cm).
+   - Dritte Schicht: Unreifer Kompost oder Stallmist (ca. 20 cm) als Heizung und Nährstoffquelle.
+   - Oberste Schicht: Hochwertige Garten- und Hochbeeterde (ca. 25 cm).
+
+Durch das Verrotten der unteren Schichten entsteht Wärme, die das Wachstum beschleunigt. Bereits im zeitigen Frühjahr kann so ausgesät werden!`
+    },
+    {
+      id: "b-5",
+      title: "Der ultimative Guide für saftige Tomaten",
+      slug: "guide-tomaten-zuechten",
+      teaser: "Tomaten gehören zu den beliebtesten Gartenpflanzen. Mit diesen Expertentipps gelingt der Anbau auf Balkon und Beet.",
+      image: "https://images.unsplash.com/photo-1592841208221-a5808df73658?auto=format&fit=crop&w=900&q=80",
+      category: "Ratgeber",
+      publishDate: "2026-06-02",
+      content: `Tomaten züchten ist keine Wissenschaft, benötigt jedoch etwas Aufmerksamkeit. Damit Ihre Pflanzen reichlich süße Früchte tragen, beachten Sie folgende Grundregeln:
+
+1. Der richtige Standort:
+Tomaten lieben es heiß und sonnig. Ein Regenschutz ist absolut essenziell, da nasse Blätter sehr anfällig für die gefürchtete Kraut- und Braunfäule sind. Gießen Sie daher immer nur direkt an den Wurzelbereich und niemals über das Laub.
+
+2. Richtig Ausgeizen:
+Bei Stabtomaten sollten Sie die sogenannten "Geiztriebe" regelmäßig entfernen. Das sind die kleinen Seitentriebe, die in den Blattachseln zwischen dem Haupttrieb und den Fruchtständen wachsen. Sie rauben der Pflanze unnötig Energie, die sonst in die Reifung der Früchte fließt.
+
+3. Nährstoffhunger stillen:
+Tomaten sind Starkzehrer. Arbeiten Sie beim Pflanzen reichlich Kompost, Hornspäne oder Pferdemist in die Erde ein. Während der Wachstums- und Fruchtphase sollten Sie alle zwei Wochen mit einem biologischen Tomatendünger oder verdünnter Brennnesseljauche nachdüngen.
+
+4. Ausreichend Wasser:
+Gießen Sie Tomaten gleichmäßig. Unregelmäßiges Gießen führt dazu, dass die Früchte bei plötzlichen Wasserschüben aufplatzen. Mulchen Sie den Boden mit Stroh oder Rasenschnitt, um die Feuchtigkeit im Boden zu halten.`
+    }
+  ],
+  events: [
+    {
+      id: "ev-1",
+      farmShopId: 1, // Maier
+      title: "Großes Hoffest & Bauernmarkt",
+      date: "2026-06-20",
+      time: "10:00 - 18:00 Uhr",
+      description: "Erleben Sie das Landleben hautnah! Wir laden ein zu unserem jährlichen Hoffest mit Traktorfahrten für Kinder, Verkostungen unserer Wurst- und Käsespezialitäten und Live-Musik im Hofgarten.",
+      location: "Dorfstraße 12, 85560 Ebersberg",
+      image: "https://images.unsplash.com/photo-1530026405186-ed1ea0ac7a63?auto=format&fit=crop&w=900&q=80",
+      category: "hoffest"
+    },
+    {
+      id: "ev-2",
+      farmShopId: null, // communal / general event
+      title: "Regionaler Wochenmarkt Ebersberg",
+      date: "2026-06-25",
+      time: "07:30 - 12:30 Uhr",
+      description: "Jeden Donnerstagmorgen verwandelt sich der Marktplatz in ein Einkaufsparadies für frische, regionale Lebensmittel. Entdecken Sie Stände mit Gemüse, Fisch, Honig, Brot und Blumen direkt aus der Region.",
+      location: "Marienplatz, 85560 Ebersberg",
+      image: "https://images.unsplash.com/photo-1488459718432-36a57e6294e1?auto=format&fit=crop&w=900&q=80",
+      category: "wochenmarkt"
+    },
+    {
+      id: "ev-3",
+      farmShopId: null, // communal / general event
+      title: "Zornedinger Bauernmarkt",
+      date: "2026-06-27",
+      time: "08:00 - 13:00 Uhr",
+      description: "Lokale Landwirte präsentieren ihre Erzeugnisse. Kaufen Sie frische Eier, Milch, Fleisch und Saisongemüse direkt von den Bauern aus der Nachbarschaft.",
+      location: "Rathausplatz, 85604 Zorneding",
+      image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80",
+      category: "wochenmarkt"
+    },
+    {
+      id: "ev-4",
+      farmShopId: 3, // Huber
+      title: "Hühnerhof Führung für Familien",
+      date: "2026-07-05",
+      time: "14:00 - 15:30 Uhr",
+      description: "Wie leben unsere Hühner im Hühnermobil? Familie Huber führt Sie über die Weiden. Kinder dürfen frisch gelegte Eier aus den Nestern sammeln und die Hühner füttern.",
+      location: "Feldweg 2, 85567 Grafing",
+      image: "https://images.unsplash.com/photo-1587486913049-53fc88980cfc?auto=format&fit=crop&w=900&q=80",
+      category: "hoffest"
+    }
+  ],
+  pickup_packages: [
+    {
+      id: "pkg-1",
+      farmShopId: 1, // Maier
+      title: "Gemüse-Retterbox (Groß)",
+      description: "Eine bunte Mischung aus reifem Saisongemüse (z.B. Tomaten, Salat, Zucchini, Karotten), das optische Mängel aufweist, aber absolut frisch und lecker ist.",
+      price: 4.50,
+      originalValue: 12.00,
+      pickupTime: "Heute 17:30 - 18:00 Uhr",
+      quantity: 4
+    },
+    {
+      id: "pkg-2",
+      farmShopId: 1, // Maier
+      title: "Milchprodukte & Käse-Paket",
+      description: "Käseecken, Quark oder Joghurt, deren Mindesthaltbarkeitsdatum kurz bevorsteht. Perfekt zum direkten Verzehr geeignet.",
+      price: 5.00,
+      originalValue: 15.00,
+      pickupTime: "Heute 17:30 - 18:00 Uhr",
+      quantity: 2
+    },
+    {
+      id: "pkg-3",
+      farmShopId: 3, // Huber
+      title: "Eier- & Backwarenbeutel",
+      description: "Eine Packung Eier aus Freilandhaltung (Größe S/M) sowie hausgemachtes Bauernbrot vom Vortag.",
+      price: 3.50,
+      originalValue: 8.50,
+      pickupTime: "Morgen 18:00 - 19:30 Uhr",
+      quantity: 3
     }
   ]
 };
@@ -137,7 +267,11 @@ export class Database {
         return DEFAULT_DATA;
       }
       const raw = fs.readFileSync(DB_FILE, 'utf8');
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      // Ensure all required fields exist (fallback for manual edits/older DB states)
+      if (!parsed.events) parsed.events = DEFAULT_DATA.events;
+      if (!parsed.pickup_packages) parsed.pickup_packages = DEFAULT_DATA.pickup_packages;
+      return parsed;
     } catch (err) {
       console.error("Database read error, returning default data:", err);
       return DEFAULT_DATA;

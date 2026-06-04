@@ -76,7 +76,8 @@ app.post('/api/auth/register', (req, res) => {
       userId: newUserId,
       name: name || 'Kunde',
       location: '',
-      savedFavorites: []
+      savedFavorites: [],
+      readingList: []
     });
   } else if (role === 'vendor') {
     const newFarmId = Math.floor(Math.random() * 900000) + 100000;
@@ -170,7 +171,7 @@ app.get('/api/farm-shops', (req, res) => {
   let publicShops = db.farm_shops.filter(f => f.approved === true);
 
   // Search filter
-  const { q, category } = req.query;
+  const { q, category, plz, radius } = req.query;
   if (q) {
     const query = q.toLowerCase();
     publicShops = publicShops.filter(f => 
@@ -183,6 +184,38 @@ app.get('/api/farm-shops', (req, res) => {
   // Category filter
   if (category && category !== 'all') {
     publicShops = publicShops.filter(f => f.category === category);
+  }
+
+  // Simulated Radius / PLZ Search filter
+  if (plz) {
+    const rKm = parseInt(radius) || 10;
+    const distanceMatrix = {
+      '85560': { 1: 1.2, 2: 6.5, 3: 9.8 },
+      '85604': { 1: 7.2, 2: 0.8, 3: 8.1 },
+      '85567': { 1: 9.2, 2: 7.9, 3: 1.5 },
+    };
+
+    const targetDistances = distanceMatrix[plz.trim()];
+
+    publicShops = publicShops.map(shop => {
+      let distanceNum = 12.5; // default simulated distance
+      if (targetDistances && targetDistances[shop.id] !== undefined) {
+        distanceNum = targetDistances[shop.id];
+      } else {
+        // Deterministic fallback based on shop name/id and PLZ
+        let sum = 0;
+        for (let i = 0; i < plz.length; i++) sum += plz.charCodeAt(i);
+        distanceNum = ((sum * shop.id) % 45) + 2.5; 
+      }
+      return {
+        ...shop,
+        distanceNum,
+        distance: `${distanceNum.toFixed(1)} km`
+      };
+    });
+
+    // Filter by radius limit
+    publicShops = publicShops.filter(shop => shop.distanceNum <= rKm);
   }
 
   res.json(publicShops);
@@ -435,6 +468,190 @@ app.delete('/api/admin/blogs/:id', authenticateToken, authorizeRole(['admin']), 
 
   Database.write(db);
   res.json({ success: true });
+});
+
+/* ==========================================================================
+   EVENTS ENDPOINTS
+   ========================================================================== */
+
+app.get('/api/events', (req, res) => {
+  const db = Database.read();
+  const { farmShopId, category } = req.query;
+  let list = db.events || [];
+
+  if (farmShopId) {
+    list = list.filter(e => e.farmShopId === parseInt(farmShopId));
+  }
+  if (category && category !== 'all') {
+    list = list.filter(e => e.category === category);
+  }
+  res.json(list);
+});
+
+app.post('/api/events', authenticateToken, authorizeRole(['vendor', 'admin']), (req, res) => {
+  const { title, date, time, description, location, category, farmShopId } = req.body;
+
+  if (!title || !date || !time || !description || !location || !category) {
+    return res.status(400).json({ error: 'Alle Felder außer Hofladen-ID sind Pflichtfelder' });
+  }
+
+  const db = Database.read();
+  
+  // If vendor is creating, verify they own the farm shop
+  if (req.user.role === 'vendor') {
+    const shop = db.farm_shops.find(f => f.ownerId === req.user.id);
+    if (!shop || shop.id !== parseInt(farmShopId)) {
+      return res.status(403).json({ error: 'Unbefugte Hofladen-Zuweisung' });
+    }
+  }
+
+  const newEvent = {
+    id: `ev-${Math.random().toString(36).substr(2, 9)}`,
+    farmShopId: farmShopId ? parseInt(farmShopId) : null,
+    title,
+    date,
+    time,
+    description,
+    location,
+    image: category === 'wochenmarkt' 
+      ? 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80'
+      : 'https://images.unsplash.com/photo-1530026405186-ed1ea0ac7a63?auto=format&fit=crop&w=900&q=80',
+    category
+  };
+
+  db.events = db.events || [];
+  db.events.push(newEvent);
+  Database.write(db);
+
+  res.status(201).json(newEvent);
+});
+
+app.delete('/api/events/:id', authenticateToken, authorizeRole(['vendor', 'admin']), (req, res) => {
+  const db = Database.read();
+  const eventIndex = db.events.findIndex(e => e.id === req.params.id);
+
+  if (eventIndex === -1) {
+    return res.status(404).json({ error: 'Event nicht gefunden' });
+  }
+
+  const event = db.events[eventIndex];
+
+  // If vendor, check ownership
+  if (req.user.role === 'vendor') {
+    const shop = db.farm_shops.find(f => f.ownerId === req.user.id);
+    if (!shop || shop.id !== event.farmShopId) {
+      return res.status(403).json({ error: 'Nicht befugt, dieses Event zu löschen' });
+    }
+  }
+
+  db.events.splice(eventIndex, 1);
+  Database.write(db);
+
+  res.json({ success: true });
+});
+
+/* ==========================================================================
+   CUSTOMER READING LIST ENDPOINTS
+   ========================================================================== */
+
+app.get('/api/customer/reading-list', authenticateToken, authorizeRole(['customer']), (req, res) => {
+  const db = Database.read();
+  const profile = db.customer_profiles.find(p => p.userId === req.user.id);
+
+  if (!profile) return res.status(404).json({ error: 'Kundenprofil nicht gefunden' });
+
+  const rl = profile.readingList || [];
+  const posts = db.blog_posts.filter(p => rl.includes(p.id));
+  res.json(posts);
+});
+
+app.post('/api/customer/reading-list/:blogId', authenticateToken, authorizeRole(['customer']), (req, res) => {
+  const { blogId } = req.params;
+  const db = Database.read();
+  const profile = db.customer_profiles.find(p => p.userId === req.user.id);
+
+  if (!profile) return res.status(404).json({ error: 'Kundenprofil nicht gefunden' });
+
+  profile.readingList = profile.readingList || [];
+  if (!profile.readingList.includes(blogId)) {
+    profile.readingList.push(blogId);
+    Database.write(db);
+  }
+  res.json({ success: true, readingList: profile.readingList });
+});
+
+app.delete('/api/customer/reading-list/:blogId', authenticateToken, authorizeRole(['customer']), (req, res) => {
+  const { blogId } = req.params;
+  const db = Database.read();
+  const profile = db.customer_profiles.find(p => p.userId === req.user.id);
+
+  if (!profile) return res.status(404).json({ error: 'Kundenprofil nicht gefunden' });
+
+  profile.readingList = profile.readingList || [];
+  profile.readingList = profile.readingList.filter(id => id !== blogId);
+  Database.write(db);
+  res.json({ success: true, readingList: profile.readingList });
+});
+
+/* ==========================================================================
+   PICKUP PACKAGES ENDPOINTS (Too Good To Go Model)
+   ========================================================================== */
+
+app.get('/api/farm-shops/:id/packages', (req, res) => {
+  const db = Database.read();
+  const pkgs = db.pickup_packages || [];
+  const shopPkgs = pkgs.filter(p => p.farmShopId === parseInt(req.params.id));
+  res.json(shopPkgs);
+});
+
+app.post('/api/vendor/packages', authenticateToken, authorizeRole(['vendor']), (req, res) => {
+  const { title, description, price, originalValue, pickupTime, quantity } = req.body;
+
+  if (!title || !price || !originalValue || !pickupTime || quantity === undefined) {
+    return res.status(400).json({ error: 'Bitte füllen Sie alle erforderlichen Felder aus.' });
+  }
+
+  const db = Database.read();
+  const shop = db.farm_shops.find(f => f.ownerId === req.user.id);
+
+  if (!shop) {
+    return res.status(404).json({ error: 'Kein Hofladen diesem Anbieter zugeordnet.' });
+  }
+
+  const newPkg = {
+    id: `pkg-${Math.random().toString(36).substr(2, 9)}`,
+    farmShopId: shop.id,
+    title,
+    description: description || '',
+    price: parseFloat(price),
+    originalValue: parseFloat(originalValue),
+    pickupTime,
+    quantity: parseInt(quantity)
+  };
+
+  db.pickup_packages = db.pickup_packages || [];
+  db.pickup_packages.push(newPkg);
+  Database.write(db);
+
+  res.status(201).json(newPkg);
+});
+
+app.post('/api/customer/packages/:id/reserve', authenticateToken, authorizeRole(['customer']), (req, res) => {
+  const db = Database.read();
+  const pkg = db.pickup_packages.find(p => p.id === req.params.id);
+
+  if (!pkg) {
+    return res.status(404).json({ error: 'Retter-Tüte nicht gefunden.' });
+  }
+
+  if (pkg.quantity <= 0) {
+    return res.status(400).json({ error: 'Dieses Angebot ist leider bereits ausverkauft.' });
+  }
+
+  pkg.quantity -= 1;
+  Database.write(db);
+
+  res.json({ success: true, quantity: pkg.quantity });
 });
 
 // Start Server
