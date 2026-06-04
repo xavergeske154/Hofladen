@@ -213,6 +213,9 @@ export default function HofladenWebAppStartseite() {
     setViewParams(params);
     setMobileMenuOpen(false);
     window.scrollTo(0, 0);
+    if (newView === "register" && params.role) {
+      setAuthRole(params.role);
+    }
   };
 
   // Auth Submit Actions
@@ -423,7 +426,7 @@ export default function HofladenWebAppStartseite() {
     setAdminSuccess("");
     try {
       await api.adminCreateBlog(newBlogForm);
-      setAdminSuccess("Blockbeitrag erfolgreich veröffentlicht!");
+      setAdminSuccess("Blogbeitrag erfolgreich veröffentlicht!");
       setNewBlogForm({ title: "", teaser: "", category: "Allgemein", content: "", image: "" });
       const loadBlogs = await api.getBlogs();
       setBlogs(loadBlogs);
@@ -435,7 +438,7 @@ export default function HofladenWebAppStartseite() {
   const handleDeleteBlog = async (blogId) => {
     try {
       await api.adminDeleteBlog(blogId);
-      setAdminSuccess("Blockbeitrag gelöscht!");
+      setAdminSuccess("Blogbeitrag gelöscht!");
       const loadBlogs = await api.getBlogs();
       setBlogs(loadBlogs);
     } catch (err) {
@@ -459,7 +462,7 @@ export default function HofladenWebAppStartseite() {
         <nav className="hidden items-center gap-6 font-semibold text-neutral-700 md:flex">
           <button onClick={() => navigateTo("home")} className={`hover:text-green-800 transition py-1 ${view === 'home' || view === 'farm-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Entdecken</button>
           <button onClick={() => navigateTo("events")} className={`hover:text-green-800 transition py-1 ${view === 'events' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Events & Kalender</button>
-          <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Block</button>
+          <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Blog</button>
           <button onClick={() => navigateTo("cookbook")} className={`hover:text-green-800 transition py-1 ${view === 'cookbook' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Kochbuch</button>
           <button onClick={() => navigateTo("affiliates")} className={`hover:text-green-800 transition py-1 ${view === 'affiliates' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Garten-Shop</button>
         </nav>
@@ -545,7 +548,7 @@ export default function HofladenWebAppStartseite() {
           >
             <button onClick={() => navigateTo("home")} className="text-left py-2 border-b border-neutral-100">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="text-left py-2 border-b border-neutral-100">Events & Kalender</button>
-            <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Block</button>
+            <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Blog</button>
             <button onClick={() => navigateTo("cookbook")} className="text-left py-2 border-b border-neutral-100">Kochbuch</button>
             <button onClick={() => navigateTo("affiliates")} className="text-left py-2 border-b border-neutral-100">Garten-Shop</button>
             {user ? (
@@ -794,24 +797,27 @@ export default function HofladenWebAppStartseite() {
           <Card className="rounded-[2rem] border-green-100 bg-green-900 text-white shadow-sm overflow-hidden">
             <CardContent className="p-6">
               <div className="mb-3 text-sm font-semibold text-green-100">Für Hofläden & Stationen</div>
-              <h3 className="text-3xl font-bold">Mehr Besucher aus deiner Region.</h3>
-              <p className="mt-4 leading-7 text-green-50">Erstelle dein Profil mit Bildern, Öffnungszeiten, Produkten und direkter Navigation. Ideal für Hofläden, Eierstationen, Milchautomaten und Verkaufsautomaten.</p>
-              <div id="preise" className="mt-6 rounded-2xl bg-white/10 p-4 border border-white/5">
-                <div className="text-sm text-green-100">Anbieter-Abo</div>
-                <div className="mt-1 text-4xl font-bold">5,99 € <span className="text-base font-medium text-green-100">/ Monat</span></div>
-              </div>
-              <Button className="mt-6 w-full rounded-full bg-white py-6 text-green-900 hover:bg-green-50" onClick={() => navigateTo(user ? "dashboard" : "register")}>
-                Hofladen eintragen
+              <h3 className="text-2xl font-bold">Als Anbieter registrieren</h3>
+              <p className="mt-4 text-sm leading-relaxed text-green-50">
+                Registriere deinen Hofladen, Milchstation, Eierstation oder Automaten völlig kostenlos. 
+                Erstelle ein Profil mit Bildern, Öffnungszeiten, Produkten, Events und deinem genauen Standort, um Kunden in deiner Region zu erreichen.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-white py-6 text-green-900 hover:bg-green-50 font-bold" onClick={() => navigateTo(user ? "dashboard" : "register", { role: "vendor" })}>
+                Anbieter-Konto erstellen
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] bg-white border border-neutral-200/60 shadow-sm">
+          <Card className="rounded-[2rem] bg-[#faf8f2] border border-green-800/10 shadow-sm">
             <CardContent className="p-6">
-              <h3 className="text-xl font-bold text-neutral-900">Kundenkonto</h3>
-              <p className="mt-2 text-neutral-700">Speichere Lieblingsorte, markiere Hofläden und finde sie jederzeit wieder.</p>
-              <Button variant="outline" className="mt-5 w-full rounded-full py-6" onClick={() => navigateTo("register")}>
-                <User className="mr-2 h-4 w-4" /> Kostenlos anmelden
+              <div className="mb-3 text-sm font-semibold text-green-800">Für Kunden & Entdecker</div>
+              <h3 className="text-2xl font-bold text-green-950">Kundenkonto anlegen</h3>
+              <p className="mt-4 text-sm leading-relaxed text-neutral-700">
+                Melde dich kostenlos an, um deine Lieblings-Hofläden in deinen Favoriten zu speichern, 
+                spannende Ratgeber in deiner Leseliste zu sichern und deine Reservierungen zu verwalten.
+              </p>
+              <Button className="mt-6 w-full rounded-full bg-green-800 py-6 text-white hover:bg-green-900 font-bold" onClick={() => navigateTo(user ? "dashboard" : "register", { role: "customer" })}>
+                <User className="mr-2 h-4 w-4" /> Jetzt kostenlos anmelden
               </Button>
             </CardContent>
           </Card>
@@ -1018,7 +1024,7 @@ export default function HofladenWebAppStartseite() {
     return (
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-green-950">Block</h1>
+          <h1 className="text-4xl font-extrabold text-green-950">Blog</h1>
           <p className="text-neutral-600 mt-2 max-w-md mx-auto">Hilfreiche DIY-Projekte, Garten-Guides und Wissenswertes über Natur & Imkerei.</p>
         </div>
 
@@ -1092,14 +1098,14 @@ export default function HofladenWebAppStartseite() {
   const renderBlogDetail = () => {
     const post = blogs.find(p => p.slug === viewParams.slug);
 
-    if (!post) return <div className="text-center py-20 text-neutral-500">Blockbeitrag wird geladen...</div>;
+    if (!post) return <div className="text-center py-20 text-neutral-500">Blogbeitrag wird geladen...</div>;
 
     const isBookmarked = readingList.some(r => r.id === post.id);
 
     return (
       <motion.article initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto space-y-6">
         <Button variant="ghost" onClick={() => navigateTo("blog")} className="mb-4">
-          &larr; Zurück zum Block
+          &larr; Zurück zum Blog
         </Button>
 
         <Card className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white">
@@ -1666,7 +1672,7 @@ export default function HofladenWebAppStartseite() {
               <Card className="p-8 text-center bg-white border border-neutral-100 rounded-2xl">
                 <Bookmark className="h-12 w-12 text-neutral-300 mx-auto mb-2" />
                 <div className="font-semibold text-neutral-600">Deine Leseliste ist noch leer</div>
-                <p className="text-neutral-400 text-sm mt-1">Sichere dir DIY-Projekte oder Ratgeber im Block, um sie später hier abzurufen.</p>
+                <p className="text-neutral-400 text-sm mt-1">Sichere dir DIY-Projekte oder Ratgeber im Blog, um sie später hier abzurufen.</p>
               </Card>
             )}
           </div>
@@ -1699,23 +1705,16 @@ export default function HofladenWebAppStartseite() {
             </CardContent>
           </Card>
 
-          {/* Subscription Manager */}
-          <Card className="rounded-[2rem] bg-green-900 text-white p-6">
+          {/* Status info */}
+          <Card className="rounded-[2rem] bg-green-950 text-white p-6 border border-neutral-800">
             <CardContent className="p-0 space-y-4">
-              <h3 className="font-bold text-lg">Abo-Status</h3>
-              <p className="text-xs text-green-100">Für 5,99 €/Monat erhältst du Premium-Präsenz in deiner Region.</p>
+              <h3 className="font-bold text-lg">Kostenloser Eintrag</h3>
+              <p className="text-xs text-green-100">Dein Hofladen-Profil ist dauerhaft kostenlos geschaltet und für alle Besucher sichtbar.</p>
               
               <div className="bg-white/10 p-3 rounded-xl border border-white/5 flex items-center justify-between">
-                <span className="text-sm font-semibold">{isSubscribed ? 'Premium Aktiv' : 'Basis-Modell'}</span>
-                <span className="text-xs bg-white/20 px-2 py-0.5 rounded">EUR 5,99</span>
+                <span className="text-sm font-semibold">Premium-Features aktiv</span>
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded font-bold">Gratis</span>
               </div>
-
-              <Button 
-                className="w-full bg-white text-green-900 hover:bg-neutral-50 rounded-full"
-                onClick={() => handleToggleSubscription(isSubscribed)}
-              >
-                {isSubscribed ? 'Abonnement kündigen' : 'Jetzt freischalten (Stripe)'}
-              </Button>
             </CardContent>
           </Card>
         </aside>
@@ -2055,18 +2054,18 @@ export default function HofladenWebAppStartseite() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold text-green-950">Betreiber-Adminbereich</h1>
-        <p className="text-neutral-500">Freigaben verwalten, Benutzerkonten einsehen und Blockartikel verfassen.</p>
+        <p className="text-neutral-500">Freigaben verwalten, Benutzerkonten einsehen und Blogartikel verfassen.</p>
       </div>
 
       {adminSuccess && <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl text-sm font-medium">{adminSuccess}</div>}
 
       {/* Admin tabs */}
-      <div className="flex gap-2 border-b border-neutral-200 pb-px">
+      <div className="flex gap-4 border-b border-neutral-200 mb-6">
         <button 
           onClick={() => setAdminTab("approvals")}
           className={`py-3 px-5 font-bold text-sm border-b-2 transition ${adminTab === 'approvals' ? 'border-green-800 text-green-900' : 'border-transparent text-neutral-500'}`}
         >
-          Hofladen-Freigaben ({adminVendors.filter(v => !v.approved).length})
+          Freigaben ({adminVendors.filter(v => !v.approved).length})
         </button>
         <button 
           onClick={() => setAdminTab("users")}
@@ -2078,7 +2077,7 @@ export default function HofladenWebAppStartseite() {
           onClick={() => setAdminTab("blogs")}
           className={`py-3 px-5 font-bold text-sm border-b-2 transition ${adminTab === 'blogs' ? 'border-green-800 text-green-900' : 'border-transparent text-neutral-500'}`}
         >
-          Block-Management
+          Blog-Management
         </button>
       </div>
 
@@ -2305,7 +2304,7 @@ export default function HofladenWebAppStartseite() {
             className={`flex flex-col items-center gap-1 ${view === 'blog' ? 'text-green-800 font-bold' : ''}`}
             onClick={() => navigateTo("blog")}
           >
-            <FileText className="h-6 w-6" />Block
+            <FileText className="h-6 w-6" />Blog
           </button>
           
           <button 
@@ -2324,7 +2323,7 @@ export default function HofladenWebAppStartseite() {
           <div className="flex gap-4">
             <button onClick={() => navigateTo("home")} className="hover:underline">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="hover:underline">Events</button>
-            <button onClick={() => navigateTo("blog")} className="hover:underline">Block</button>
+            <button onClick={() => navigateTo("blog")} className="hover:underline">Blog</button>
             <button onClick={() => navigateTo("cookbook")} className="hover:underline">Kochbuch</button>
             <button onClick={() => navigateTo("affiliates")} className="hover:underline">Gartenshop</button>
             <button onClick={() => navigateTo("login")} className="hover:underline">Anbieter-Portal</button>
