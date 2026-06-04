@@ -271,7 +271,7 @@ const isShopOpenNow = (shop) => {
 
 export default function HofladenWebAppStartseite() {
   // Navigation State
-  const [view, setView] = useState("home"); // home, farm-detail, blog, blog-detail, login, register, dashboard, events, cookbook, affiliates
+  const [view, setView] = useState("home"); // home, farm-detail, blog, blog-detail, login, register, dashboard, events, hofmarkt
   const [viewParams, setViewParams] = useState({});
 
   // Global Session State
@@ -402,6 +402,7 @@ export default function HofladenWebAppStartseite() {
   // Blog States
   const [selectedBlogCat, setSelectedBlogCat] = useState("all");
   const [blogSearch, setBlogSearch] = useState("");
+  const [selectedHofmarktCat, setSelectedHofmarktCat] = useState("books");
 
   // Sync guest favorites & reading list from localStorage
   useEffect(() => {
@@ -523,10 +524,17 @@ export default function HofladenWebAppStartseite() {
         setView("events");
         setViewParams({});
       } else if (hash === "#/cookbook") {
-        setView("cookbook");
+        setSelectedHofmarktCat("books");
+        setView("hofmarkt");
         setViewParams({});
+        window.location.hash = "#/hofmarkt";
       } else if (hash === "#/affiliates") {
-        setView("affiliates");
+        setSelectedHofmarktCat("garden");
+        setView("hofmarkt");
+        setViewParams({});
+        window.location.hash = "#/hofmarkt";
+      } else if (hash === "#/hofmarkt") {
+        setView("hofmarkt");
         setViewParams({});
       } else if (hash === "#/dashboard") {
         setView("dashboard");
@@ -930,8 +938,7 @@ export default function HofladenWebAppStartseite() {
           <button onClick={() => navigateTo("home")} className={`hover:text-green-800 transition py-1 ${view === 'home' || view === 'farm-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Entdecken</button>
           <button onClick={() => navigateTo("events")} className={`hover:text-green-800 transition py-1 ${view === 'events' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Events & Kalender</button>
           <button onClick={() => navigateTo("blog")} className={`hover:text-green-800 transition py-1 ${view === 'blog' || view === 'blog-detail' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Blog</button>
-          <button onClick={() => navigateTo("cookbook")} className={`hover:text-green-800 transition py-1 ${view === 'cookbook' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Kochbuch</button>
-          <button onClick={() => navigateTo("affiliates")} className={`hover:text-green-800 transition py-1 ${view === 'affiliates' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Garten-Shop</button>
+          <button onClick={() => navigateTo("hofmarkt")} className={`hover:text-green-800 transition py-1 ${view === 'hofmarkt' ? 'text-green-950 border-b-2 border-green-800' : ''}`}>Hofmarkt</button>
         </nav>
 
         {/* Desktop Actions */}
@@ -1005,8 +1012,7 @@ export default function HofladenWebAppStartseite() {
             <button onClick={() => navigateTo("home")} className="text-left py-2 border-b border-neutral-100">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="text-left py-2 border-b border-neutral-100">Events & Kalender</button>
             <button onClick={() => navigateTo("blog")} className="text-left py-2 border-b border-neutral-100">Blog</button>
-            <button onClick={() => navigateTo("cookbook")} className="text-left py-2 border-b border-neutral-100">Kochbuch</button>
-            <button onClick={() => navigateTo("affiliates")} className="text-left py-2 border-b border-neutral-100">Garten-Shop</button>
+            <button onClick={() => navigateTo("hofmarkt")} className="text-left py-2 border-b border-neutral-100">Hofmarkt</button>
             <button onClick={() => navigateTo("dashboard")} className="text-left py-2 border-b border-neutral-100">Mein Bereich (Merkliste)</button>
             {user && (
               <div className="flex items-center justify-between py-2">
@@ -1867,105 +1873,16 @@ export default function HofladenWebAppStartseite() {
     );
   };
 
-  // Cookbook Print-on-Demand Shop Page
-  const renderCookbook = () => {
-    const recipes = [
-      { name: "Kürbissuppe mit Apfel & Kürbiskernöl", duration: "35 Min" },
-      { name: "Knuspriger Entenbraten mit Blaukraut", duration: "120 Min" },
-      { name: "Traditioneller Zwetschgen-Datschi", duration: "50 Min" },
-      { name: "Frischer Spargelsalat mit Erdbeerdressing", duration: "20 Min" }
+  // Hofmarkt Shop Page
+  const renderHofmarkt = () => {
+    const categories = [
+      { id: "books", label: "Bücher & Guides", icon: Book },
+      { id: "merch", label: "Merch", icon: ShoppingBag },
+      { id: "garden", label: "Garten & Pflanzen", icon: Leaf },
+      { id: "gifts", label: "Geschenkideen", icon: HeartHandshake }
     ];
 
-    return (
-      <div className="max-w-5xl mx-auto space-y-10">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-green-950 flex items-center justify-center gap-2">
-            <Book className="h-9 w-9 text-green-800" /> Hofladen-Kochbuch-Reihe
-          </h1>
-          <p className="text-neutral-600 mt-2 max-w-xl mx-auto">Regionale Rezepte direkt von unseren Landwirten. Im hochwertigen Print-on-Demand Verfahren auf Recyclingpapier gedruckt und CO₂-neutral versendet.</p>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Spring/Summer Edition */}
-          <Card className="overflow-hidden rounded-[2.5rem] border-neutral-200 bg-white p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition">
-            <div className="w-full md:w-44 shrink-0 aspect-[3/4] bg-emerald-800 text-white rounded-2xl p-4 flex flex-col justify-between shadow-lg transform rotate-[-2deg]">
-              <div className="border border-white/20 p-2 rounded text-center text-xs tracking-wider uppercase font-semibold">Frühling & Sommer</div>
-              <div className="text-center">
-                <h3 className="text-lg font-bold leading-tight font-serif">Das Hofladen</h3>
-                <h2 className="text-2xl font-black font-serif tracking-tight mt-1">KOCHBUCH</h2>
-                <div className="h-0.5 bg-white/40 my-2" />
-                <p className="text-[10px] italic">Ausgabe I</p>
-              </div>
-              <div className="text-center text-[10px] uppercase font-semibold">50 Regionale Rezepte</div>
-            </div>
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-green-800 bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">Print-on-Demand</span>
-                <h2 className="text-2xl font-bold text-neutral-900 mt-2">Ausgabe I: Frühling & Sommer</h2>
-                <p className="text-neutral-600 text-sm mt-2 leading-relaxed">Spargel, Rhabarber, Erdbeeren und frische Salate. Lerne, wie du mit heimischen Zutaten leichte, gesunde Gerichte zauberst.</p>
-                <div className="mt-4 flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
-                  <span className="text-xs text-neutral-500 font-semibold">(4.9/5 bei 42 Bewertungen)</span>
-                </div>
-              </div>
-              <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4">
-                <span className="text-2xl font-extrabold text-green-950">12,90 €</span>
-                <Button className="rounded-full bg-green-800 hover:bg-green-900 font-bold" onClick={() => alert("Dieses Kochbuch wird per Print-on-Demand direkt für dich gedruckt. Weiterleitung zum Partnershop...")}>Bestellen</Button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Autumn/Winter Edition */}
-          <Card className="overflow-hidden rounded-[2.5rem] border-neutral-200 bg-white p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition">
-            <div className="w-full md:w-44 shrink-0 aspect-[3/4] bg-amber-900 text-white rounded-2xl p-4 flex flex-col justify-between shadow-lg transform rotate-[2deg]">
-              <div className="border border-white/20 p-2 rounded text-center text-xs tracking-wider uppercase font-semibold">Herbst & Winter</div>
-              <div className="text-center">
-                <h3 className="text-lg font-bold leading-tight font-serif">Das Hofladen</h3>
-                <h2 className="text-2xl font-black font-serif tracking-tight mt-1">KOCHBUCH</h2>
-                <div className="h-0.5 bg-white/40 my-2" />
-                <p className="text-[10px] italic">Ausgabe II</p>
-              </div>
-              <div className="text-center text-[10px] uppercase font-semibold">50 Deftige Rezepte</div>
-            </div>
-            <div className="flex-1 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-green-800 bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">Print-on-Demand</span>
-                <h2 className="text-2xl font-bold text-neutral-900 mt-2">Ausgabe II: Herbst & Winter</h2>
-                <p className="text-neutral-600 text-sm mt-2 leading-relaxed">Kürbisgerichte, wärmende Suppen, Deftiges vom Weiderind und süße Weihnachtsklassiker. Perfekt für die kalte Jahreszeit.</p>
-                <div className="mt-4 flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
-                  <span className="text-xs text-neutral-500 font-semibold">(4.8/5 bei 29 Bewertungen)</span>
-                </div>
-              </div>
-              <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4">
-                <span className="text-2xl font-extrabold text-green-950">12,90 €</span>
-                <Button className="rounded-full bg-green-800 hover:bg-green-900 font-bold" onClick={() => alert("Dieses Kochbuch wird per Print-on-Demand direkt für dich gedruckt. Weiterleitung zum Partnershop...")}>Bestellen</Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Recipe Preview Section */}
-        <section className="bg-green-50/40 border border-green-150/40 rounded-[2.5rem] p-8 space-y-6">
-          <h2 className="text-2xl font-bold text-green-950 text-center">Blick ins Buch: Rezeptbeispiele</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {recipes.map((rec, index) => (
-              <div key={index} className="flex justify-between items-center bg-white p-4 rounded-2xl border border-green-100/40 shadow-sm">
-                <div className="font-semibold text-neutral-800 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-800" /> {rec.name}
-                </div>
-                <span className="text-xs font-bold text-green-900 bg-green-50/80 px-3 py-1 rounded-full">{rec.duration}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    );
-  };
-
-  // Affiliate Partner Shop Page
-  const renderAffiliates = () => {
-    const products = [
+    const gardenProducts = [
       {
         id: "ap-1",
         title: "Lärchen-Hochbeet Komplettbausatz",
@@ -2004,48 +1921,223 @@ export default function HofladenWebAppStartseite() {
       }
     ];
 
+    const merchProducts = [
+      {
+        id: "me-1",
+        title: "Hofladen Baumwoll-Jutebeutel",
+        description: "100% zertifizierte Bio-Baumwolle, extrem strapazierfähig mit langem Henkel. Bedruckt mit unserem exklusiven Motiv 'Support Your Local Farmer'.",
+        price: 6.90,
+        image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80",
+        rating: "4.9"
+      },
+      {
+        id: "me-2",
+        title: "Emaillierte Tasse 'Landliebe'",
+        description: "Bruchsichere, kratzfeste Emaille-Tasse mit handgezeichnetem Wiesenblumen-Motiv. Spülmaschinengeeignet und perfekt fürs Draußensein.",
+        price: 9.90,
+        image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=400&q=80",
+        rating: "4.8"
+      },
+      {
+        id: "me-3",
+        title: "Bienenwachstücher Starter-Set",
+        description: "3er-Set in verschiedenen Größen (S, M, L) aus Bio-Bienenwachs, Jojobaöl und Baumwolle. Die plastikfreie Alternative für frische Lebensmittel.",
+        price: 14.90,
+        image: "https://images.unsplash.com/photo-1605264964528-06403738d6df?auto=format&fit=crop&w=400&q=80",
+        rating: "4.7"
+      }
+    ];
+
+    const giftProducts = [
+      {
+        id: "gi-1",
+        title: "Schmankerl Präsentkorb 'Premium'",
+        description: "Ein rustikaler Weidenkorb gefüllt mit Wildschwein-Hausmacherwurst, Waldblütenhonig, hausgemachtem Kräutersalz, Fruchtaufstrich und Landlikör.",
+        price: 45.00,
+        image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&w=400&q=80",
+        rating: "5.0"
+      },
+      {
+        id: "gi-2",
+        title: "Imker-Geschenkbox 'Bienenkraft'",
+        description: "Zwei Gläser erlesener Frühjahrsblüten- und Waldhonig, eine handgerollte Bienenwachskerze und eine kleine Flasche milder Honig-Met.",
+        price: 24.90,
+        image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80",
+        rating: "4.9"
+      },
+      {
+        id: "gi-3",
+        title: "Käsesortiment 'Alpenruhe' Holzkiste",
+        description: "Feine Auswahl von 4 regionalen Heumilchkäse-Spezialitäten (ca. 600g Gesamtgewicht) inklusive einer kleinen Schale feurigem Feigensenf.",
+        price: 29.90,
+        image: "https://images.unsplash.com/photo-1486887396153-fa416525c308?auto=format&fit=crop&w=400&q=80",
+        rating: "4.8"
+      }
+    ];
+
+    const recipes = [
+      { name: "Kürbissuppe mit Apfel & Kürbiskernöl", duration: "35 Min" },
+      { name: "Knuspriger Entenbraten mit Blaukraut", duration: "120 Min" },
+      { name: "Traditioneller Zwetschgen-Datschi", duration: "50 Min" },
+      { name: "Frischer Spargelsalat mit Erdbeerdressing", duration: "20 Min" }
+    ];
+
+    const getActiveProducts = () => {
+      if (selectedHofmarktCat === "merch") return merchProducts;
+      if (selectedHofmarktCat === "garden") return gardenProducts;
+      if (selectedHofmarktCat === "gifts") return giftProducts;
+      return [];
+    };
+
+    const activeProducts = getActiveProducts();
+
     return (
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-10">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-green-950 flex items-center justify-center gap-2">
-            <BookOpen className="h-9 w-9 text-green-800" /> Garten- & Selbstversorger-Shop
+            <Store className="h-9 w-9 text-green-800" /> Hofmarkt
           </h1>
-          <p className="text-neutral-600 mt-2 max-w-xl mx-auto">Ausgewählte Produktempfehlungen rund um das Gärtnern, Kompostieren und Ziehen eigener Gemüsepflanzen. Wir erhalten bei Kauf eine kleine Affiliate-Provision.</p>
+          <p className="text-neutral-600 mt-2 max-w-xl mx-auto">Entdecke Kochbücher, praktischen Gärtnerbedarf, Geschenkideen und liebevollen Merch rund um unsere Landwirtschaft.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {products.map(prod => (
-            <Card key={prod.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white p-4 shadow-sm flex gap-4 hover:shadow-md transition">
-              <div className="h-32 w-32 shrink-0 rounded-2xl overflow-hidden">
-                <img src={prod.image} alt={prod.title} className="w-full h-full object-cover" />
-              </div>
-              <div className="flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-extrabold text-neutral-900 text-lg leading-snug">{prod.title}</h3>
-                  <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{prod.description}</p>
-                  <div className="flex items-center gap-1 mt-2 text-xs font-semibold">
-                    <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {prod.rating}
+        {/* Categories Tabs */}
+        <div className="flex gap-2 justify-center border-b border-neutral-200 pb-px">
+          {categories.map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedHofmarktCat(tab.id)}
+                className={`py-2.5 px-4 font-bold text-sm border-b-2 transition flex items-center gap-2 ${
+                  selectedHofmarktCat === tab.id 
+                    ? 'border-green-800 text-green-900' 
+                    : 'border-transparent text-neutral-500 hover:text-neutral-700'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {selectedHofmarktCat === "books" ? (
+          <div className="space-y-10">
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Spring/Summer Edition */}
+              <Card className="overflow-hidden rounded-[2.5rem] border-neutral-200 bg-white p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition">
+                <div className="w-full md:w-44 shrink-0 aspect-[3/4] bg-emerald-800 text-white rounded-2xl p-4 flex flex-col justify-between shadow-lg transform rotate-[-2deg]">
+                  <div className="border border-white/20 p-2 rounded text-center text-xs tracking-wider uppercase font-semibold">Frühling & Sommer</div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-bold leading-tight font-serif">Das Hofladen</h3>
+                    <h2 className="text-2xl font-black font-serif tracking-tight mt-1">KOCHBUCH</h2>
+                    <div className="h-0.5 bg-white/40 my-2" />
+                    <p className="text-[10px] italic">Ausgabe I</p>
+                  </div>
+                  <div className="text-center text-[10px] uppercase font-semibold">50 Regionale Rezepte</div>
+                </div>
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-green-800 bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">Print-on-Demand</span>
+                    <h2 className="text-2xl font-bold text-neutral-900 mt-2">Ausgabe I: Frühling & Sommer</h2>
+                    <p className="text-neutral-600 text-sm mt-2 leading-relaxed">Spargel, Rhabarber, Erdbeeren und frische Salate. Lerne, wie du mit heimischen Zutaten leichte, gesunde Gerichte zauberst.</p>
+                    <div className="mt-4 flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                      <span className="text-xs text-neutral-500 font-semibold">(4.9/5 bei 42 Bewertungen)</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4">
+                    <span className="text-2xl font-extrabold text-green-950">12,90 €</span>
+                    <Button className="rounded-full bg-green-800 hover:bg-green-900 font-bold" onClick={() => alert("Dieses Kochbuch wird per Print-on-Demand direkt für dich gedruckt. Weiterleitung zum Partnershop...")}>Bestellen</Button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-neutral-50">
-                  <span className="font-extrabold text-green-900">{prod.price.toFixed(2)} €</span>
-                  <Button 
-                    className="rounded-full bg-green-800 hover:bg-green-900 text-xs font-bold h-9 px-4"
-                    onClick={() => {
-                      alert("Weiterleitung zu Amazon. Als Affiliate-Partner verdienen wir an qualifizierten Verkäufen.");
-                      window.open(prod.link, "_blank");
-                    }}
-                  >
-                    Kaufen &rarr;
-                  </Button>
+              </Card>
+
+              {/* Autumn/Winter Edition */}
+              <Card className="overflow-hidden rounded-[2.5rem] border-neutral-200 bg-white p-6 shadow-sm flex flex-col md:flex-row gap-6 hover:shadow-md transition">
+                <div className="w-full md:w-44 shrink-0 aspect-[3/4] bg-amber-900 text-white rounded-2xl p-4 flex flex-col justify-between shadow-lg transform rotate-[2deg]">
+                  <div className="border border-white/20 p-2 rounded text-center text-xs tracking-wider uppercase font-semibold">Herbst & Winter</div>
+                  <div className="text-center">
+                    <h3 className="text-lg font-bold leading-tight font-serif">Das Hofladen</h3>
+                    <h2 className="text-2xl font-black font-serif tracking-tight mt-1">KOCHBUCH</h2>
+                    <div className="h-0.5 bg-white/40 my-2" />
+                    <p className="text-[10px] italic">Ausgabe II</p>
+                  </div>
+                  <div className="text-center text-[10px] uppercase font-semibold">50 Deftige Rezepte</div>
                 </div>
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-green-800 bg-green-50 px-2.5 py-0.5 rounded-full border border-green-200">Print-on-Demand</span>
+                    <h2 className="text-2xl font-bold text-neutral-900 mt-2">Ausgabe II: Herbst & Winter</h2>
+                    <p className="text-neutral-600 text-sm mt-2 leading-relaxed">Kürbisgerichte, wärmende Suppen, Deftiges vom Weiderind und süße Weihnachtsklassiker. Perfekt für die kalte Jahreszeit.</p>
+                    <div className="mt-4 flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                      <span className="text-xs text-neutral-500 font-semibold">(4.8/5 bei 29 Bewertungen)</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4">
+                    <span className="text-2xl font-extrabold text-green-950">12,90 €</span>
+                    <Button className="rounded-full bg-green-800 hover:bg-green-900 font-bold" onClick={() => alert("Dieses Kochbuch wird per Print-on-Demand direkt für dich gedruckt. Weiterleitung zum Partnershop...")}>Bestellen</Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Recipe Preview Section */}
+            <section className="bg-green-50/40 border border-green-150/40 rounded-[2.5rem] p-8 space-y-6">
+              <h2 className="text-2xl font-bold text-green-950 text-center">Blick ins Buch: Rezeptbeispiele</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {recipes.map((rec, index) => (
+                  <div key={index} className="flex justify-between items-center bg-white p-4 rounded-2xl border border-green-100/40 shadow-sm">
+                    <div className="font-semibold text-neutral-800 flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-green-800" /> {rec.name}
+                    </div>
+                    <span className="text-xs font-bold text-green-900 bg-green-50/80 px-3 py-1 rounded-full">{rec.duration}</span>
+                  </div>
+                ))}
               </div>
-            </Card>
-          ))}
-        </div>
+            </section>
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            {activeProducts.map(prod => (
+              <Card key={prod.id} className="overflow-hidden rounded-[2rem] border-neutral-200 bg-white p-4 shadow-sm flex gap-4 hover:shadow-md transition">
+                <div className="h-32 w-32 shrink-0 rounded-2xl overflow-hidden">
+                  <img src={prod.image} alt={prod.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-extrabold text-neutral-900 text-lg leading-snug">{prod.title}</h3>
+                    <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{prod.description}</p>
+                    <div className="flex items-center gap-1 mt-2 text-xs font-semibold">
+                      <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {prod.rating}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-neutral-50">
+                    <span className="font-extrabold text-green-900">{prod.price.toFixed(2)} €</span>
+                    <Button 
+                      className="rounded-full bg-green-800 hover:bg-green-900 text-xs font-bold h-9 px-4"
+                      onClick={() => {
+                        if (prod.link) {
+                          alert("Weiterleitung zu Amazon. Als Affiliate-Partner verdienen wir an qualifizierten Verkäufen.");
+                          window.open(prod.link, "_blank");
+                        } else {
+                          alert(`"${prod.title}" wurde in deinen Warenkorb gelegt!`);
+                        }
+                      }}
+                    >
+                      {prod.link ? "Kaufen \u2192" : "In den Warenkorb"}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
+
 
   // 5. LOGIN PAGE
   const renderLogin = () => (
@@ -2905,8 +2997,7 @@ export default function HofladenWebAppStartseite() {
             {view === 'blog' && renderBlogList()}
             {view === 'blog-detail' && renderBlogDetail()}
             {view === 'events' && renderEvents()}
-            {view === 'cookbook' && renderCookbook()}
-            {view === 'affiliates' && renderAffiliates()}
+            {view === 'hofmarkt' && renderHofmarkt()}
             {view === 'login' && renderLogin()}
             {view === 'register' && renderRegister()}
             {view === 'dashboard' && renderDashboard()}
@@ -2962,8 +3053,7 @@ export default function HofladenWebAppStartseite() {
             <button onClick={() => navigateTo("home")} className="hover:underline">Entdecken</button>
             <button onClick={() => navigateTo("events")} className="hover:underline">Events</button>
             <button onClick={() => navigateTo("blog")} className="hover:underline">Blog</button>
-            <button onClick={() => navigateTo("cookbook")} className="hover:underline">Kochbuch</button>
-            <button onClick={() => navigateTo("affiliates")} className="hover:underline">Gartenshop</button>
+            <button onClick={() => navigateTo("hofmarkt")} className="hover:underline">Hofmarkt</button>
             <button onClick={() => navigateTo("login")} className="hover:underline">Anbieter-Portal</button>
           </div>
         </div>
