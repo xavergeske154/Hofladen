@@ -5,21 +5,21 @@
       "email": "admin@hofladen.de",
       "passwordHash": "YWRtaW5wYXNz",
       "role": "admin",
-      "createdAt": "2026-06-04T13:22:39.668Z"
+      "createdAt": "2026-06-04T19:18:31.293Z"
     },
     {
       "id": "u-kunde",
       "email": "kunde@hofladen.de",
       "passwordHash": "a3VuZGVwYXNz",
       "role": "customer",
-      "createdAt": "2026-06-04T13:22:39.669Z"
+      "createdAt": "2026-06-04T19:18:31.293Z"
     },
     {
       "id": "u-bauer",
       "email": "bauer@hofladen.de",
       "passwordHash": "YmF1ZXJwYXNz",
       "role": "vendor",
-      "createdAt": "2026-06-04T13:22:39.669Z"
+      "createdAt": "2026-06-04T19:18:31.293Z"
     }
   ],
   "customer_profiles": [
@@ -129,7 +129,7 @@
       "slug": "honig-herstellung",
       "teaser": "Fleißige Bienen, bunte Blüten und viel Geduld – so entsteht das flüssige Gold unserer heimischen Imker.",
       "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=900&q=80",
-      "category": "Imkerei",
+      "category": "Produkte",
       "publishDate": "2026-05-12",
       "content": "Honig ist eines der ältesten Naturprodukte der Menschheit. Aber wie genau entsteht der süße Saft eigentlich? \n\nAlles beginnt bei den Bienen, die von Blüte zu Blüte fliegen, um Nektar und Honigtau zu sammeln. Die Bienen nehmen den Nektar mit ihrem Saugrüssel auf und transportieren ihn in ihrer Honigblase zurück zum Bienenstock. \n\nIm Bienenstock angekommen, wird der Nektar von Biene zu Biene weitergegeben. Dabei wird er mit körpereigenen Enzymen angereichert und verliert Wasser. Dadurch verdickt der Saft und wird haltbar gemacht. Wenn der Wassergehalt unter 18% sinkt, verschließen die Bienen die Waben mit einer feinen Wachsschicht.\n\nDer Imker entnimmt die Waben, entfernt die Wachsschicht und schleudert den Honig in einer Honigschleuder kalt heraus. Nach dem Filtern ist der Honig bereit für das Glas – pur, regional und naturbelassen."
     },
@@ -139,7 +139,7 @@
       "slug": "warum-regionale-eier-besser-sind",
       "teaser": "Der Stempel auf dem Ei verrät viel, aber der persönliche Blick auf den Hühnerhof verrät noch mehr.",
       "image": "https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=900&q=80",
-      "category": "Geflügel",
+      "category": "Regionales",
       "publishDate": "2026-05-18",
       "content": "Wer Eier im Supermarkt kauft, verlässt sich auf Gütesiegel. Beim Kauf am Eierautomaten oder direkt im Hofladen ist das anders: Hier kauft man direkt beim Erzeuger.\n\nJedes Ei in Deutschland trägt einen Erzeugercode (z.B. 1-DE-0912341). Die erste Zahl verrät das Haltungssystem (0 = Bio, 1 = Freiland, 2 = Bodenhaltung). DE steht für Deutschland, und die restlichen Ziffern identifizieren genau den Betrieb und den Stall.\n\nBei Eiern von regionalen Stationen sieht man das Hühnermobil meist direkt neben der Verkaufsbox stehen. Man weiß genau, was die Hühner fressen, wie viel Auslauf sie haben und wer der Landwirt hinter dem Produkt ist. Das schafft Vertrauen und spart lange Transportwege."
     },
@@ -149,9 +149,9 @@
       "slug": "was-ist-rohmilch",
       "teaser": "Frische Milch direkt ab Kuh – an Milchstationen tankst du unbehandelte Milch. Das musst du beachten.",
       "image": "https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=900&q=80",
-      "category": "Milch",
+      "category": "Hofläden",
       "publishDate": "2026-05-20",
-      "content": "Rohmilch ist Milch in ihrer natürlichsten Form. Sie wird nach dem Melken lediglich gefiltert und gekühlt. Im Gegensatz zur Supermarkt-Milch ist sie weder pasteurisiert (erhitzt) noch homogenisiert (unter Druck zerstäubt).\n\nDas hat Vorteile: Rohmilch behält ihren natürlichen Fettgehalt (meist um die 4%) und alle Vitamine und Enzyme. Der Geschmack ist unvergleichlich cremig und aromatisch.\n\nDa Rohmilch jedoch nicht erhitzt wurde, kann sie natürliche Keime enthalten. Für Schwangere, Kleinkinder und immungeschwächte Personen wird empfohlen, Rohmilch vor dem Verzehr abzukochen. An Milchzapfstellen ist dieser Hinweis gesetzlich vorgeschrieben. Frische Rohmilch hält sich gekühlt etwa 2–3 Tage."
+      "content": "Rohmilch ist Milch in ihrer natürlichsten Form. Sie wird nach dem Melken lediglich gefiltert und gekühlt. Im Gegensatz zur Supermarkt-Milch is sie weder pasteurisiert (erhitzt) noch homogenisiert (unter Druck zerstäubt).\n\nDas hat Vorteile: Rohmilch behält ihren natürlichen Fettgehalt (meist um die 4%) und alle Vitamine und Enzyme. Der Geschmack ist unvergleichlich cremig und aromatisch.\n\nDa Rohmilch jedoch nicht erhitzt wurde, kann sie natürliche Keime enthalten. Für Schwangere, Kleinkinder und immungeschwächte Personen wird empfohlen, Rohmilch vor dem Verzehr abzukochen. An Milchzapfstellen ist dieser Hinweis gesetzlich vorgeschrieben. Frische Rohmilch hält sich gekühlt etwa 2–3 Tage."
     },
     {
       "id": "b-4",
@@ -159,7 +159,7 @@
       "slug": "hochbeet-selber-bauen",
       "teaser": "Ein eigenes Hochbeet bauen schont den Rücken, hält Schädlinge fern und steigert den Ertrag. So gelingt das Holz-Projekt.",
       "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&q=80",
-      "category": "DIY",
+      "category": "Tipps & Wissen",
       "publishDate": "2026-06-01",
       "content": "Hochbeete liegen im Trend. Sie ermöglichen rückenschonendes Gärtnern und bieten ideale Wachstumsbedingungen für Salat, Kräuter und Gemüse.\n\nMaterialien für ein langlebiges Holz-Hochbeet:\n- Lärchen- oder Douglasienbretter (ca. 4 cm dick)\n- Kanthölzer für die Ecken\n- Teichfolie oder Noppenbahn zur Innenauskleidung\n- Wühlmausgitter (engmaschiger Draht)\n- Schrauben aus Edelstahl\n\nSchritt-für-Schritt-Anleitung:\n1. Standort ebnen: Wählen Sie einen sonnigen Platz im Garten und stechen Sie die Grasnarbe ab.\n2. Holzrahmen verschrauben: Befestigen Sie die Bretter an den Eck-Kanthölzern, um die Kiste zu formen.\n3. Wühlmausschutz montieren: Tackern Sie den feinmaschigen Draht am Boden fest, um Nagetiere auszusperren.\n4. Folie auslegen: Kleiden Sie die Innenwände mit Noppenbahn aus, um das Holz vor ständiger Feuchtigkeit aus der Erde zu schützen.\n5. Das Schichtsystem befüllen:\n   - Unterste Schicht: Grober Holzschnitt, Äste und Zweige (ca. 20 cm) für gute Belüftung.\n   - Zweite Schicht: Rasenschnitt, Laub oder feineres Astwerk (ca. 15 cm).\n   - Dritte Schicht: Unreifer Kompost oder Stallmist (ca. 20 cm) als Heizung und Nährstoffquelle.\n   - Oberste Schicht: Hochwertige Garten- und Hochbeeterde (ca. 25 cm).\n\nDurch das Verrotten der unteren Schichten entsteht Wärme, die das Wachstum beschleunigt. Bereits im zeitigen Frühjahr kann so ausgesät werden!"
     },
@@ -169,9 +169,19 @@
       "slug": "die-kraft-der-kamille",
       "teaser": "Die echte Kamille ist ein Wundermittel der Natur. Erfahre alles über Wirkung, Ernte und Anwendung bei uns.",
       "image": "https://images.unsplash.com/photo-1600181519808-16147498dbf5?auto=format&fit=crop&w=900&q=80",
-      "category": "Ratgeber",
+      "category": "Tipps & Wissen",
       "publishDate": "2026-06-02",
       "content": "Die echte Kamille (Matricaria chamomilla) gehört zu den ältesten und beliebtesten Heilpflanzen Europas. Ihre Anwendungsbereiche sind extrem vielfältig – ob als Tee, Dampfbad, Tinktur oder Umschlag.\n\n1. Die Heilwirkung:\nDie Blüten der Kamille enthalten ätherische Öle (wie Bisabolol und Chamazulen) sowie Flavonoide. Diese Wirkstoffe wirken entzündungshemmend, krampflösend, antibakteriell und beruhigend auf Magen und Darm sowie auf die Haut.\n\n2. Kamille im eigenen Garten ernten:\nKamille wächst hervorragend an sonnigen Standorten auf nährstoffreichen, durchlässigen Böden. Geerntet werden die Blütenköpfe an einem trockenen Vormittag, sobald sie voll erblüht sind. Breiten Sie die Blüten zum Trocknen an einem schattigen, luftigen Ort aus.\n\n3. Einfache Anwendungen:\n- Kamillentee: 2 TL getrocknete Blüten mit 250ml kochendem Wasser übergießen, 10 Minuten abgedeckt ziehen lassen. Hilft bei Magen-Darm-Beschwerden oder zum Gurgeln bei Entzündungen im Mundraum.\n- Inhalation bei Erkältung: Eine Handvoll Blüten in eine Schüssel mit heißem Wasser geben, den Kopf mit einem Handtuch abdecken und 10 Minuten den heilsamen Dampf einatmen.\n- Umschläge: Abgekühlter Kamillensud lindert Hautreizungen und kleine Entzündungen."
+    },
+    {
+      "id": "b-6",
+      "title": "Omas klassischer Erdbeerkuchen",
+      "slug": "omas-klassischer-erdbeerkuchen",
+      "teaser": "Frische Erdbeeren direkt vom Feld schmecken am besten auf einem lockeren Biskuitboden mit Pudding.",
+      "image": "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=900&q=80",
+      "category": "Rezepte",
+      "publishDate": "2026-06-03",
+      "content": "Erdbeerzeit ist die schönste Zeit! Wenn die roten Früchte auf den Feldern der Hofläden reif sind, gibt es nichts Besseres als einen selbstgebackenen Erdbeerkuchen.\n\nZutaten für den Biskuitboden:\n- 3 Eier (Größe M, frisch vom Hühnerhof)\n- 100g Zucker\n- 1 Pck. Vanillezucker\n- 100g Weizenmehl\n- 1 TL Backpulver\n\nZutaten für den Belag:\n- 500g frische Erdbeeren (vom regionalen Erdbeerfeld)\n- 1 Pck. Vanillepuddingpulver\n- 350ml Milch (frische Rohmilch oder Vollmilch)\n- 2 EL Zucker\n- 1 Pck. roten Tortenguss\n\nZubereitung:\n1. Den Ofen auf 180°C Ober-/Unterhitze vorheizen. Eine Obstkuchenform fetten und mehlen.\n2. Eier mit Zucker und Vanillezucker ca. 5 Minuten cremig weiß schlagen. Mehl und Backpulver mischen, sieben und vorsichtig unterheben.\n3. Den Teig in die Form füllen und ca. 15-20 Minuten goldgelb backen. Auskühlen lassen.\n4. Aus Puddingpulver, 350ml Milch und 2 EL Zucker einen festen Pudding kochen. Etwas abkühlen lassen und auf dem Biskuitboden verstreichen.\n5. Erdbeeren waschen, putzen, halbieren und den Kuchen damit dicht belegen.\n6. Tortenguss nach Packungsanleitung zubereiten, zügig über den Erdbeeren verteilen und fest werden lassen.\n\nGekühlt servieren – ein echter Sommertraum direkt aus der Region!"
     }
   ],
   "events": [

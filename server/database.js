@@ -113,7 +113,7 @@ const DEFAULT_DATA = {
       slug: "honig-herstellung",
       teaser: "Fleißige Bienen, bunte Blüten und viel Geduld – so entsteht das flüssige Gold unserer heimischen Imker.",
       image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=900&q=80",
-      category: "Imkerei",
+      category: "Produkte",
       publishDate: "2026-05-12",
       content: `Honig ist eines der ältesten Naturprodukte der Menschheit. Aber wie genau entsteht der süße Saft eigentlich? 
 
@@ -129,7 +129,7 @@ Der Imker entnimmt die Waben, entfernt die Wachsschicht und schleudert den Honig
       slug: "warum-regionale-eier-besser-sind",
       teaser: "Der Stempel auf dem Ei verrät viel, aber der persönliche Blick auf den Hühnerhof verrät noch mehr.",
       image: "https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&w=900&q=80",
-      category: "Geflügel",
+      category: "Regionales",
       publishDate: "2026-05-18",
       content: `Wer Eier im Supermarkt kauft, verlässt sich auf Gütesiegel. Beim Kauf am Eierautomaten oder direkt im Hofladen ist das anders: Hier kauft man direkt beim Erzeuger.
 
@@ -143,9 +143,9 @@ Bei Eiern von regionalen Stationen sieht man das Hühnermobil meist direkt neben
       slug: "was-ist-rohmilch",
       teaser: "Frische Milch direkt ab Kuh – an Milchstationen tankst du unbehandelte Milch. Das musst du beachten.",
       image: "https://images.unsplash.com/photo-1527018601619-a508a2be00cd?auto=format&fit=crop&w=900&q=80",
-      category: "Milch",
+      category: "Hofläden",
       publishDate: "2026-05-20",
-      content: `Rohmilch ist Milch in ihrer natürlichsten Form. Sie wird nach dem Melken lediglich gefiltert und gekühlt. Im Gegensatz zur Supermarkt-Milch ist sie weder pasteurisiert (erhitzt) noch homogenisiert (unter Druck zerstäubt).
+      content: `Rohmilch ist Milch in ihrer natürlichsten Form. Sie wird nach dem Melken lediglich gefiltert und gekühlt. Im Gegensatz zur Supermarkt-Milch is sie weder pasteurisiert (erhitzt) noch homogenisiert (unter Druck zerstäubt).
 
 Das hat Vorteile: Rohmilch behält ihren natürlichen Fettgehalt (meist um die 4%) und alle Vitamine und Enzyme. Der Geschmack ist unvergleichlich cremig und aromatisch.
 
@@ -157,7 +157,7 @@ Da Rohmilch jedoch nicht erhitzt wurde, kann sie natürliche Keime enthalten. F�
       slug: "hochbeet-selber-bauen",
       teaser: "Ein eigenes Hochbeet bauen schont den Rücken, hält Schädlinge fern und steigert den Ertrag. So gelingt das Holz-Projekt.",
       image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&q=80",
-      category: "DIY",
+      category: "Tipps & Wissen",
       publishDate: "2026-06-01",
       content: `Hochbeete liegen im Trend. Sie ermöglichen rückenschonendes Gärtnern und bieten ideale Wachstumsbedingungen für Salat, Kräuter und Gemüse.
 
@@ -187,7 +187,7 @@ Durch das Verrotten der unteren Schichten entsteht Wärme, die das Wachstum besc
       slug: "die-kraft-der-kamille",
       teaser: "Die echte Kamille ist ein Wundermittel der Natur. Erfahre alles über Wirkung, Ernte und Anwendung bei uns.",
       image: "https://images.unsplash.com/photo-1600181519808-16147498dbf5?auto=format&fit=crop&w=900&q=80",
-      category: "Ratgeber",
+      category: "Tipps & Wissen",
       publishDate: "2026-06-02",
       content: `Die echte Kamille (Matricaria chamomilla) gehört zu den ältesten und beliebtesten Heilpflanzen Europas. Ihre Anwendungsbereiche sind extrem vielfältig – ob als Tee, Dampfbad, Tinktur oder Umschlag.
 
@@ -201,6 +201,40 @@ Kamille wächst hervorragend an sonnigen Standorten auf nährstoffreichen, durch
 - Kamillentee: 2 TL getrocknete Blüten mit 250ml kochendem Wasser übergießen, 10 Minuten abgedeckt ziehen lassen. Hilft bei Magen-Darm-Beschwerden oder zum Gurgeln bei Entzündungen im Mundraum.
 - Inhalation bei Erkältung: Eine Handvoll Blüten in eine Schüssel mit heißem Wasser geben, den Kopf mit einem Handtuch abdecken und 10 Minuten den heilsamen Dampf einatmen.
 - Umschläge: Abgekühlter Kamillensud lindert Hautreizungen und kleine Entzündungen.`
+    },
+    {
+      id: "b-6",
+      title: "Omas klassischer Erdbeerkuchen",
+      slug: "omas-klassischer-erdbeerkuchen",
+      teaser: "Frische Erdbeeren direkt vom Feld schmecken am besten auf einem lockeren Biskuitboden mit Pudding.",
+      image: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=900&q=80",
+      category: "Rezepte",
+      publishDate: "2026-06-03",
+      content: `Erdbeerzeit ist die schönste Zeit! Wenn die roten Früchte auf den Feldern der Hofläden reif sind, gibt es nichts Besseres als einen selbstgebackenen Erdbeerkuchen.
+
+Zutaten für den Biskuitboden:
+- 3 Eier (Größe M, frisch vom Hühnerhof)
+- 100g Zucker
+- 1 Pck. Vanillezucker
+- 100g Weizenmehl
+- 1 TL Backpulver
+
+Zutaten für den Belag:
+- 500g frische Erdbeeren (vom regionalen Erdbeerfeld)
+- 1 Pck. Vanillepuddingpulver
+- 350ml Milch (frische Rohmilch oder Vollmilch)
+- 2 EL Zucker
+- 1 Pck. roten Tortenguss
+
+Zubereitung:
+1. Den Ofen auf 180°C Ober-/Unterhitze vorheizen. Eine Obstkuchenform fetten und mehlen.
+2. Eier mit Zucker und Vanillezucker ca. 5 Minuten cremig weiß schlagen. Mehl und Backpulver mischen, sieben und vorsichtig unterheben.
+3. Den Teig in die Form füllen und ca. 15-20 Minuten goldgelb backen. Auskühlen lassen.
+4. Aus Puddingpulver, 350ml Milch und 2 EL Zucker einen festen Pudding kochen. Etwas abkühlen lassen und auf dem Biskuitboden verstreichen.
+5. Erdbeeren waschen, putzen, halbieren und den Kuchen damit dicht belegen.
+6. Tortenguss nach Packungsanleitung zubereiten, zügig über den Erdbeeren verteilen und fest werden lassen.
+
+Gekühlt servieren – ein echter Sommertraum direkt aus der Region!`
     }
   ],
   events: [

@@ -1544,10 +1544,11 @@ export default function HofladenWebAppStartseite() {
         <div className="flex gap-2 justify-center border-b border-neutral-200 pb-px">
           {[
             { id: "all", label: "Alle" },
-            { id: "diy", label: "DIY-Projekte" },
-            { id: "ratgeber", label: "Garten-Guides" },
-            { id: "imkerei", label: "Imkerei" },
-            { id: "milch", label: "Milch & Geflügel" }
+            { id: "hofläden", label: "Hofläden" },
+            { id: "produkte", label: "Produkte" },
+            { id: "regionales", label: "Regionales" },
+            { id: "rezepte", label: "Rezepte" },
+            { id: "tipps & wissen", label: "Tipps & Wissen" }
           ].map(tab => (
             <button
               key={tab.id}
