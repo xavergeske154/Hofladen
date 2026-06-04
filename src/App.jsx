@@ -941,13 +941,12 @@ export default function HofladenWebAppStartseite() {
                 onKeyDown={(e) => { if (e.key === 'Enter') { setSearchQuery(searchInput); setSearchPlz(plzInput); } }}
               />
             </div>
-
-            <div className="flex w-full md:w-36 items-center gap-1.5 px-2">
+            <div className="flex w-full md:w-44 items-center gap-1.5 px-2">
               <span className="text-xs text-neutral-400 uppercase font-bold shrink-0">Radius:</span>
               <select 
                 value={searchRadius}
                 onChange={(e) => setSearchRadius(e.target.value)}
-                className="bg-transparent outline-none text-sm font-semibold text-neutral-700 w-full py-2 cursor-pointer"
+                className="bg-transparent outline-none text-sm font-semibold text-neutral-700 w-full py-2 pr-6 cursor-pointer"
               >
                 <option value="2">2 km</option>
                 <option value="5">5 km</option>
